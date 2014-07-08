@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<head>
+    <title>New Campaign</title>
+    <!-- <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> -->
+</head>
+
+<body>
+
+	<div>
+		<form method="POST" action="/campaigns/new">
+			{% csrf_token %}
+			{{ form }}
+			<input type="submit" value="Submit" />
+		</form>
+	</div>
+
+</body>
+
+</html>
