@@ -9,8 +9,12 @@
 	<div>
 		<form method="POST" action="/campaigns/new">
 			{% csrf_token %}
-			{{ form }}
+			{{ form.title }}
+			{{ form.description }}
 			<input type="submit" value="Submit" />
+			<!-- {% if error %}
+				{{ error }}
+			{% endif %} -->
 		</form>
 	</div>
 

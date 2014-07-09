@@ -1,6 +1,9 @@
 from django.test import TestCase
 from django.http import HttpRequest
-from campaigns.views import create_campaign
+from campaigns.views import (
+	create_campaign, show_campaign, 
+	EMPTY_CAMPAIGN_FIELDS_ERROR,
+)
 from campaigns.models import Campaign
 from campaigns.forms import CampaignForm
 
@@ -39,3 +42,15 @@ class CampaignsViewsTest(TestCase):
 		create_campaign(make_POST_request('', ''))
 		self.assertEqual(Campaign.objects.count(), 0)
 
+	# def test_does_create_campaign_return_error_messages_on_failed_validation(self):
+	# 	response = create_campaign(make_POST_request('',''))
+	# 	self.assertContains(response.content.decode(), EMPTY_CAMPAIGN_FIELDS_ERROR)	
+
+	def test_does_show_campaign_resolves_the_right_url(self):
+		campaign = Campaign.objects.create(title = 'a', description = 'b')
+		called = self.client.get('/campaigns/%d/' % (campaign.id,))
+		self.assertTemplateUsed(called, 'show_campaign.html')
+
+	def test_does_show_campaign_redirects_home_if_campaign_is_None(self):
+		response  = self.client.get('/campaigns/%d/' % (100))
+		self.assertTemplateUsed(response, 'home.html')
