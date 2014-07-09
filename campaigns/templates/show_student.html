@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Show existing student{% endblock %}
+
+{% block show_student %}
+	<div class="panel panel-primary">
+		<div class = "panel-body">
+			Entry number: <p>{{student.entry_number}}</p>
+			First name: <p>{{student.first_name}}</p>
+			Second name: <p>{{student.second_name}}</p>
+			Third name: <p>{{student.third_name}}</p>
+			EGN: <p>{{student.egn}}</p>
+		</div>
+	</div>
+{% endblock %}

@@ -3,6 +3,7 @@ from django.http import HttpRequest
 from campaigns.views import (
 	create_campaign, show_campaign, 
 	list_campaigns, create_student,
+	show_student,
 	EMPTY_CAMPAIGN_FIELDS_ERROR,
 )
 from campaigns.models import Campaign, Student
@@ -60,7 +61,7 @@ class CampaignsViewsTest(TestCase):
 
 	def test_does_show_campaign_redirects_home_if_campaign_is_None(self):
 		response  = self.client.get('/campaigns/%d/' % (100))
-		self.assertTemplateUsed(response, 'home.html')
+		self.assertRedirects(response, '/')
 
 	def test_does_show_campaign_list_title_and_description_if_campaign_exist(self):
 		self.assertEqual(Campaign.objects.count(),0)
@@ -68,7 +69,7 @@ class CampaignsViewsTest(TestCase):
 		self.assertEqual(Campaign.objects.count(),1)
 		response = self.client.get('/campaigns/%d/' % (campaign.id))
 		self.assertEqual(response.status_code, 200)
-		self.assertContains(response, 'alright')
+		self.assertNotContains(response, 'alright')
 		self.assertContains(response, 'base')
 
 	def test_does_show_campaign_lists_all_students_enrolled_in_it(self):
@@ -157,8 +158,30 @@ class StudentViewTest(TestCase):
 		)	
 		self.assertRedirects(response, '/campaigns/%d/' % campaign.id)
 
+	def test_does_show_student_resolves_the_right_url(self):
+		self.assertEqual(Campaign.objects.count(), 0)
+		self.assertEqual(Student.objects.count(), 0)
+		campaign = Campaign.objects.create(title='a', description='b')
+		student = Student.objects.create(
+			campaign=campaign, first_name='Pesho', second_name='Petrov',
+			third_name='Popov', egn = 1234567891, entry_number=1
+		)
+		response = self.client.get('/campaigns/%d/students/%d/' % (campaign.id, student.id))
+		self.assertTemplateUsed(response, 'show_student.html')
 
-
+	def test_does_show_student_lists_appropriate_fields(self):	
+		self.assertEqual(Campaign.objects.count(), 0)
+		self.assertEqual(Student.objects.count(), 0)
+		campaign = Campaign.objects.create(title='a', description='b')
+		student = Student.objects.create(
+			campaign=campaign, first_name='Pesho', second_name='Petrov',
+			third_name='Popov', egn = 1234567891, entry_number=1
+		)
+		response = show_student(HttpRequest(), campaign.id, student.id)
+		self.assertContains(response, 'Pesho')
+		self.assertContains(response, 'Petrov')
+		self.assertContains(response, 'Popov')
+		self.assertContains(response, 1234567891)
 
 
 

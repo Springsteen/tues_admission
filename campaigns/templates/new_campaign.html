@@ -7,8 +7,15 @@
 	<div class="panel panel-primary">
 		<form method="POST" action="/campaigns/new" role="form">
 			{% csrf_token %}
-			Title: <br>{{ form.title }}<br>
-			Description: <br>{{ form.description }}<br>
+			
+			<div class="form-group">
+				Title: <br>{{ form.title }}<br>
+			</div>
+
+			<div class="form-group">
+				Description: <br>{{ form.description }}<br>
+			</div>
+
 			<input type="submit" value="Submit" class="btn btn-primary"/>
 			<!-- {% if error %}
 				{{ error }}

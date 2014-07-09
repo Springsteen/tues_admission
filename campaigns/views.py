@@ -25,7 +25,7 @@ def show_campaign(request, campaign_id):
 		students = campaign.student_set.all()
 		return render(request, 'show_campaign.html', {'campaign': campaign, 'students': students})
 	except ObjectDoesNotExist:
-		return render(request, 'home.html')
+		return redirect('/')
 
 def list_campaigns(request):
 	campaigns = Campaign.objects.all()
@@ -44,3 +44,12 @@ def create_student(request, campaign_id):
 		return redirect(Campaign.objects.get(id=campaign_id))
 	else:
 		return render(request, 'create_student.html', {'form': form, 'campaign_id': campaign_id})
+
+def show_student(request, campaign_id, student_id):
+	campaign = Campaign.objects.get(id = campaign_id)
+	student = Student.objects.get(id = student_id)
+	return render(request, 'show_student.html', {'campaign': campaign, 'student': student})
+
+
+
+
