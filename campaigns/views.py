@@ -38,9 +38,6 @@ def create_student(request, campaign_id):
 		saved_student.entry_number = Student.objects.count()
 		saved_student.save()
 		students = Campaign.objects.get(id=campaign_id).student_set.all()
-		return render(request, 'show_campaign.html', {
-			'campaign': Campaign.objects.get(id=campaign_id),
-			'students': students
-		})
+		return redirect(Campaign.objects.get(id=campaign_id))
 	else:
 		return render(request, 'create_student.html', {'form': form, 'campaign_id': campaign_id})

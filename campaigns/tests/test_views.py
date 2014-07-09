@@ -154,12 +154,8 @@ class StudentViewTest(TestCase):
 				'first_name': 'asen', 'second_name': 'asenov',
 				'third_name': 'asenski', 'egn': '1234567890'
 			}
-		)
-		student_c_id = Student.objects.last().campaign.id
-		self.assertContains(response, 'asen')
-		self.assertContains(response, 'asenov')
-		self.assertContains(response, 'asenski')
-		self.assertContains(response, '1234567890')	
+		)	
+		self.assertRedirects(response, '/campaigns/%d/' % campaign.id)
 
 
 
