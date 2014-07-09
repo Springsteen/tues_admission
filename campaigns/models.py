@@ -13,6 +13,6 @@ class Student(models.Model):
 	campaign = models.ForeignKey(Campaign, default = Campaign.DEFAULT_PK)
 	egn = models.IntegerField(default=0) 
 	entry_number = models.IntegerField(default=0)
-	first_name = models.CharField(max_length=30, default='', blank=True)
+	first_name = models.CharField(max_length=30, default='')
 	second_name = models.CharField(max_length=30, default='')
 	third_name = models.CharField(max_length=30, default='')
