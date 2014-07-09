@@ -1,23 +1,19 @@
-<!DOCTYPE html>
-<head>
-    <title>New Campaign</title>
-    <!-- <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> -->
-</head>
+{% extends 'base.html' %}
+ 
+{% block title %}Create new campaign{% endblock %}
 
-<body>
+{% block new_campaign %}
 
-	<div>
-		<form method="POST" action="/campaigns/new">
+	<div class="panel panel-primary">
+		<form method="POST" action="/campaigns/new" role="form">
 			{% csrf_token %}
-			{{ form.title }}
-			{{ form.description }}
-			<input type="submit" value="Submit" />
+			Title: <br>{{ form.title }}<br>
+			Description: <br>{{ form.description }}<br>
+			<input type="submit" value="Submit" class="btn btn-primary"/>
 			<!-- {% if error %}
 				{{ error }}
 			{% endif %} -->
 		</form>
 	</div>
 
-</body>
-
-</html>
+{% endblock %}

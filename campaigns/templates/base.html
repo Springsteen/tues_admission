@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+</head>
+
+<body>
+
+	<div class = "container">
+		{% block home %}{% endblock %}
+		{% block new_campaign %}{% endblock %}
+		{% block show_campaign %}{% endblock %}
+	</div>
+
+</body>

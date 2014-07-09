@@ -1,16 +1,18 @@
-<!DOCTYPE html>
-<head>
-    <title>Show Campaign</title>
-    <!-- <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> -->
-</head>
+{% extends 'base.html' %}
 
-<body>
+{% block title %}Show existing campaign{% endblock %}
 
-	<div>
-		<p>{{campaign.title}}</p><br>
-		<p>{{campaign.description}}</p>
+{% block new_campaign %}
+
+	<div class="panel panel-primary">
+		<div class = "panel-heading">
+			<h2 class = "panel-title">
+			{{campaign.title}}
+			</h2>
+		</div>
+		<div class = "panel-body">
+			<p>{{campaign.description}}</p>
+		</div>
 	</div>
 
-</body>
-
-</html>
+{% endblock %}

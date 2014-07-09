@@ -54,3 +54,12 @@ class CampaignsViewsTest(TestCase):
 	def test_does_show_campaign_redirects_home_if_campaign_is_None(self):
 		response  = self.client.get('/campaigns/%d/' % (100))
 		self.assertTemplateUsed(response, 'home.html')
+
+	def test_does_show_campaign_list_title_and_description_if_campaign_exist(self):
+		self.assertEqual(Campaign.objects.count(),0)
+		campaign = Campaign.objects.create(title = 'alright', description = 'base')
+		self.assertEqual(Campaign.objects.count(),1)
+		response = self.client.get('/campaigns/%d/' % (campaign.id))
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'alright')
+		self.assertContains(response, 'base')
