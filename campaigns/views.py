@@ -2,12 +2,14 @@ from django.shortcuts import render, redirect
 from campaigns.models import Campaign, Student
 from campaigns.forms import CampaignForm, StudentForm
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 
 EMPTY_CAMPAIGN_FIELDS_ERROR = 'There are validation errors in your submitted form'
 
 def home(request):
 	return render(request, 'home.html')
 
+@transaction.atomic
 def create_campaign(request):
 	form = CampaignForm(data=request.POST)
 	if form.is_valid():
@@ -29,6 +31,7 @@ def list_campaigns(request):
 	campaigns = Campaign.objects.all()
 	return render(request, 'list_campaigns.html', {'campaigns': campaigns})
 
+@transaction.atomic
 def create_student(request, campaign_id):
 	form = StudentForm(request.POST)
 	if form.is_valid():
