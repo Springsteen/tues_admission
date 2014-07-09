@@ -12,7 +12,8 @@ def create_campaign(request):
 	form = CampaignForm(data=request.POST)
 	if form.is_valid():
 		form.save()
-		return render(request, 'home.html')
+		campaign = Campaign.objects.last()
+		return redirect(campaign)
 	else:
 		return render(request, 'new_campaign.html', {'form': form})
 

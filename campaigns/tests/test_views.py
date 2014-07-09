@@ -42,6 +42,16 @@ class CampaignsViewsTest(TestCase):
 		create_campaign(make_POST_request('', ''))
 		self.assertEqual(Campaign.objects.count(), 0)
 
+	def test_create_campaign_redirects_to_show_campaign_on_success(self):
+		self.assertEqual(Campaign.objects.count(), 0)
+		response = self.client.post(
+            '/campaigns/new',
+            data={'title': 'asd', 'description': 'asdf'}
+        )
+		campaign = Campaign.objects.first()
+		self.assertEqual(Campaign.objects.count(), 1)
+		self.assertRedirects(response, '/campaigns/%d/' % campaign.id)
+
 	# def test_does_create_campaign_return_error_messages_on_failed_validation(self):
 	# 	response = create_campaign(make_POST_request('',''))
 	# 	self.assertContains(response.content.decode(), EMPTY_CAMPAIGN_FIELDS_ERROR)	
