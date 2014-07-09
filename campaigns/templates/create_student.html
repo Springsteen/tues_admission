@@ -7,13 +7,17 @@
 	<div class="panel panel-primary">
 		<form method="POST" action="/campaigns/{{campaign_id}}/students/new" role="form">
 			{% csrf_token %}
-			<br>{{ form.first_name }}<br>
-			<br>{{ form.second_name }}<br>
-			<br>{{ form.third_name }}<br>
-			<br>{{ form.egn }}<br>
-			<br>{{ form.campaign }}<br>
-			<br>{{ form.entry_number }}<br>
+			
+			First name: <br>{{ form.first_name }}<br><br>
+			
+			Second name: <br>{{ form.second_name }}<br><br>
+			
+			Third name: <br>{{ form.third_name }}<br><br>
+			
+			EGN: <br>{{ form.egn }}<br><br>
+			
 			<input type="submit" value="Submit" class="btn btn-primary"/>
+			
 			<!-- {% if error %}
 				{{ error }}
 			{% endif %} -->

@@ -2,7 +2,7 @@
 
 {% block title %}Show existing campaign{% endblock %}
 
-{% block new_campaign %}
+{% block show_campaign %}
 
 	<div class="panel panel-primary">
 		<div class = "panel-heading">
@@ -14,5 +14,30 @@
 			<p>{{campaign.description}}</p>
 		</div>
 	</div>
+
+	<table class="table table-hover table-bordered">	
+		<thead>
+			<tr>
+				<td>№</td>
+				<td>First name</td>
+				<td>Second name</td>
+				<td>Third name</td>
+				<td>EGN</td>
+				<!-- <td>Show</td> -->
+			</tr>
+		</thead>
+		<tbody>
+			{% for s in students %}
+				<tr>				
+					<td>{{ forloop.counter }}</td>
+					<td>{{ s.first_name }}</td>
+					<td>{{ s.second_name }}</td>
+					<td>{{ s.third_name }}</td>
+					<td>{{ s.egn }}</td>
+					<!-- <td><a href="/campaigns/{{ campaign.id }}/">Show</a></td> -->
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 
 {% endblock %}

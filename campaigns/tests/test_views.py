@@ -126,6 +126,41 @@ class StudentViewTest(TestCase):
 		self.assertEqual(Student.objects.first().first_name, 'Pesho')
 		self.assertEqual(Student.objects.first().egn, 1234554321)
 
+	def test_does_create_student_gives_students_appropriate_entry_numbers(self):	
+		campaign = Campaign.objects.create(title='a', description='b')
+		self.assertEqual(Student.objects.count(), 0)
+		create_student(
+			make_POST_request_for_student(1234554321,'Pesho','Petrov','Popov'),
+			campaign.id
+		)
+		create_student(
+			make_POST_request_for_student(5511223344,'Asen','Petrov','Popov'),
+			campaign.id
+		)
+		create_student(
+			make_POST_request_for_student(3399887766,'Gosho','Petrov','Popov'),
+			campaign.id
+		)
+		self.assertEqual(Student.objects.count(), 3)
+		students = Student.objects.all()
+		for i,s in enumerate(students):
+			self.assertEqual(s.entry_number, i+1)	
+
+	def test_does_create_student_redirects_to_the_campaign_he_belongs_to(self):
+		campaign = Campaign.objects.create(title='a', description='b')
+		response = self.client.post(
+			'/campaigns/%d/students/new' % campaign.id,
+			data={
+				'first_name': 'asen', 'second_name': 'asenov',
+				'third_name': 'asenski', 'egn': '1234567890'
+			}
+		)
+		student_c_id = Student.objects.last().campaign.id
+		self.assertContains(response, 'asen')
+		self.assertContains(response, 'asenov')
+		self.assertContains(response, 'asenski')
+		self.assertContains(response, '1234567890')	
+
 
 
 
