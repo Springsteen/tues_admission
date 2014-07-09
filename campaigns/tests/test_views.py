@@ -2,18 +2,12 @@ from django.test import TestCase
 from django.http import HttpRequest
 from campaigns.views import (
 	create_campaign, show_campaign, 
-	list_campaigns,
+	list_campaigns, create_student,
 	EMPTY_CAMPAIGN_FIELDS_ERROR,
 )
-from campaigns.models import Campaign
+from campaigns.models import Campaign, Student
 from campaigns.forms import CampaignForm
 
-def make_POST_request(titleValue, descriptionValue):
-	request = HttpRequest()
-	request.method = 'POST'
-	request.POST['title'] = titleValue
-	request.POST['description'] = descriptionValue
-	return request
 
 class HomePageTest(TestCase):
 
@@ -21,6 +15,12 @@ class HomePageTest(TestCase):
 		called = self.client.get('/')
 		self.assertTemplateUsed(called, 'home.html')
 
+def make_POST_request_for_campaign(titleValue, descriptionValue):
+	request = HttpRequest()
+	request.method = 'POST'
+	request.POST['title'] = titleValue
+	request.POST['description'] = descriptionValue
+	return request
 
 class CampaignsViewsTest(TestCase):
 
@@ -32,7 +32,7 @@ class CampaignsViewsTest(TestCase):
 	# reason so i made it that ugly
 	def test_does_create_campaign_saves_objects_with_POST_requests(self):
 		self.assertEqual(Campaign.objects.count(), 0)
-		create_campaign(make_POST_request('C1', 'C1Descr'))
+		create_campaign(make_POST_request_for_campaign('C1', 'C1Descr'))
 		campaign = Campaign.objects.first()
 		self.assertEqual(Campaign.objects.count(), 1)
 		self.assertEqual(campaign.title, 'C1')
@@ -40,7 +40,7 @@ class CampaignsViewsTest(TestCase):
 
 	def test_create_campaign_dont_saves_empty_objects(self):
 		self.assertEqual(Campaign.objects.count(), 0)
-		create_campaign(make_POST_request('', ''))
+		create_campaign(make_POST_request_for_campaign('', ''))
 		self.assertEqual(Campaign.objects.count(), 0)
 
 	def test_create_campaign_redirects_to_show_campaign_on_success(self):
@@ -71,6 +71,11 @@ class CampaignsViewsTest(TestCase):
 		self.assertContains(response, 'alright')
 		self.assertContains(response, 'base')
 
+	def test_does_show_campaign_lists_all_students_enrolled_in_it(self):
+		pass
+		# campaign = Campaign.objects.create(title = 'alright', description = 'base')
+		# student1 = Student.objects.create()
+
 	def test_does_list_campaigns_resolves_the_right_url(self):
 		called = self.client.get('/campaigns')
 		self.assertTemplateUsed(called, 'list_campaigns.html')
@@ -85,5 +90,45 @@ class CampaignsViewsTest(TestCase):
 		self.assertContains(response,'second_d')
 
 	# def test_does_create_campaign_return_error_messages_on_failed_validation(self):
-	# 	response = create_campaign(make_POST_request('',''))
+	# 	response = create_campaign(make_POST_request_for_campaign('',''))
 	# 	self.assertContains(response.content.decode(), EMPTY_CAMPAIGN_FIELDS_ERROR)	
+
+def make_POST_request_for_student(egn, firstName, secondName, thirdName):
+	request = HttpRequest()
+	request.method = 'POST'
+	request.POST['egn'] = egn
+	request.POST['first_name'] = firstName
+	request.POST['second_name'] = secondName
+	request.POST['third_name'] = thirdName
+	return request
+
+class StudentViewTest(TestCase):
+
+	def test_does_create_student_resolves_the_right_url(self):
+		campaign = Campaign.objects.create(title='a', description='b')
+		campaign.save()
+		called = self.client.get('/campaigns/%d/students/new' % campaign.id)
+		self.assertTemplateUsed(called, 'create_student.html')
+
+	def test_does_create_student_saves_new_student_on_POST_request(self):
+		campaign = Campaign.objects.create(title='a', description='b')
+		self.assertEqual(Student.objects.count(), 0)
+		response = create_student(
+			make_POST_request_for_student(1234554321,'Pesho','Petrov','Popov'),
+			campaign.id
+		)
+		self.assertEqual(Student.objects.count(), 1)
+		self.assertEqual(
+			campaign,
+			Student.objects.first().campaign
+		)
+		self.assertEqual(Student.objects.first().entry_number, 1)
+		self.assertEqual(Student.objects.first().first_name, 'Pesho')
+		self.assertEqual(Student.objects.first().egn, 1234554321)
+
+
+
+
+
+
+

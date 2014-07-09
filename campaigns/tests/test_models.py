@@ -8,7 +8,6 @@ class CampaignsModelsTest(TestCase):
 		campaign.save()
 		student = Student.objects.create(campaign=campaign)
 		student.first_name = 'Random'
-		print(student.first_name)
 		student.second_name = 'Randomer'
 		student.third_name = 'Randomizer'
 		student.egn = 1234567890
