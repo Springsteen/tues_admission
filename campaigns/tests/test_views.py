@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.http import HttpRequest
 from campaigns.views import (
 	create_campaign, show_campaign, 
+	list_campaigns,
 	EMPTY_CAMPAIGN_FIELDS_ERROR,
 )
 from campaigns.models import Campaign
@@ -52,10 +53,6 @@ class CampaignsViewsTest(TestCase):
 		self.assertEqual(Campaign.objects.count(), 1)
 		self.assertRedirects(response, '/campaigns/%d/' % campaign.id)
 
-	# def test_does_create_campaign_return_error_messages_on_failed_validation(self):
-	# 	response = create_campaign(make_POST_request('',''))
-	# 	self.assertContains(response.content.decode(), EMPTY_CAMPAIGN_FIELDS_ERROR)	
-
 	def test_does_show_campaign_resolves_the_right_url(self):
 		campaign = Campaign.objects.create(title = 'a', description = 'b')
 		called = self.client.get('/campaigns/%d/' % (campaign.id,))
@@ -73,3 +70,20 @@ class CampaignsViewsTest(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, 'alright')
 		self.assertContains(response, 'base')
+
+	def test_does_list_campaigns_resolves_the_right_url(self):
+		called = self.client.get('/campaigns')
+		self.assertTemplateUsed(called, 'list_campaigns.html')
+
+	def test_does_list_campaigns_renders_all_campaigns(self):
+		self.assertEqual(Campaign.objects.count(), 0)
+		Campaign.objects.create(title = 'first', description='first_d').save()
+		Campaign.objects.create(title = 'second', description='second_d').save()
+		self.assertEqual(Campaign.objects.count(), 2)
+		response = list_campaigns(HttpRequest())
+		self.assertContains(response,'first')
+		self.assertContains(response,'second_d')
+
+	# def test_does_create_campaign_return_error_messages_on_failed_validation(self):
+	# 	response = create_campaign(make_POST_request('',''))
+	# 	self.assertContains(response.content.decode(), EMPTY_CAMPAIGN_FIELDS_ERROR)	

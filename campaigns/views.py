@@ -23,3 +23,7 @@ def show_campaign(request, campaign_id):
 		return render(request, 'show_campaign.html', {'campaign': campaign})
 	except ObjectDoesNotExist:
 		return render(request, 'home.html')
+
+def list_campaigns(request):
+	campaigns = Campaign.objects.all()
+	return render(request, 'list_campaigns.html', {'campaigns': campaigns})
