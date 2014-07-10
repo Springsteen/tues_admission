@@ -3,6 +3,8 @@ from campaigns.models import Campaign, Student
 from campaigns.forms import CampaignForm, StudentForm
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
 
 EMPTY_CAMPAIGN_FIELDS_ERROR = 'There are validation errors in your submitted form'
 
@@ -81,6 +83,19 @@ def show_student(request, campaign_id, student_id):
 	student = Student.objects.get(id = student_id)
 	return render(request, 'show_student.html', {'campaign': campaign, 'student': student})
 
+def student_as_pdf(request, campaign_id, student_id):
+	response = HttpResponse(content_type='application/pdf')
+	response['Content-Disposition'] = ('attachment; filename="%s.pdf"' % student_id)
+	student = Student.objects.get(id = student_id)
 
+	p = canvas.Canvas(response)
 
+	p.drawString(100, 100, student.first_name)
+	p.drawString(100, 200, student.second_name)
+	p.drawString(100, 300, student.third_name)
+	p.drawString(100, 400, str(student.egn))
+
+	p.showPage()
+	p.save()
+	return response
 

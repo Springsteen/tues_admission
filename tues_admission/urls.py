@@ -8,6 +8,7 @@ urlpatterns = patterns('',
     url(r'^campaigns/(\d+)/$', 'campaigns.views.show_campaign', name='show_campaign'),
     url(r'^campaigns/(\d+)/students/new$', 'campaigns.views.create_student', name='create_student'),
     url(r'^campaigns/(\d+)/students/(\d+)/$', 'campaigns.views.show_student', name='show_student'),
+    url(r'^campaigns/(\d+)/students/(\d+).pdf/$', 'campaigns.views.student_as_pdf', name='student_as_pdf'),
     url(r'^campaigns/(\d+)/students/(\d+)/edit$', 'campaigns.views.edit_student', name='edit_student'),
     url(r'^admin/', include(admin.site.urls)),
 )
