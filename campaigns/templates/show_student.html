@@ -1,17 +1,27 @@
 {% extends 'base.html' %}
 
-{% block title %}Show existing student{% endblock %}
+{% block title %}Ученик{% endblock %}
 
-{% block to_the_campaign %}<li class="active"><a href="/campaigns/{{ campaign.id }}/">Back to the campaign</a></li>{% endblock %}
+{% block to_the_campaign %}<li class="active"><a href="/campaigns/{{ campaign.id }}/">Към кампанията</a></li>{% endblock %}
 
 {% block show_student %}
 	<div class="panel panel-primary">
 		<div class = "panel-body">
-			Entry number: <p>{{student.entry_number}}</p>
-			First name: <p>{{student.first_name}}</p>
-			Second name: <p>{{student.second_name}}</p>
-			Third name: <p>{{student.third_name}}</p>
-			EGN: <p>{{student.egn}}</p>
+			Входящ номер: {{student.entry_number}}<br><br>
+			Първо име: {{student.first_name}}<br><br>
+			Презиме: {{student.second_name}}<br><br>
+			Фамилия: {{student.third_name}}<br><br>
+			ЕГН: {{student.egn}}<br><br>
+			Адрес: {{student.address}}<br><br>
+			Имена на родител: {{student.parent_name}}<br><br>
+			Училище: {{student.previous_school}}<br><br>
+			БЕЛ-Училище: {{student.bel_school}}<br><br>
+			Физика-Училище: {{student.physics_school}}<br><br>
+			БЕЛ-Матура: {{student.bel_exam}}<br><br>
+			Математика-Матура: {{student.maths_exam}}<br><br>
+			Математика-ТУЕС: {{student.maths_tues_exam}}<br><br>
+			Първо желание: {{student.first_choice}}<br><br>
+			Второ желание: {{student.second_choice}}<br><br>
 		</div>
 	</div>
 {% endblock %}

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
  
-{% block title %}Create new campaign{% endblock %}
+{% block title %}Създай нова кампания{% endblock %}
 
 {% block new_campaign %}
 
@@ -9,14 +9,14 @@
 			{% csrf_token %}
 			
 			<div class="form-group">
-				Title: <br>{{ form.title }}<br>
+				Име: <br>{{ form.title }}<br>
 			</div>
 
 			<div class="form-group">
-				Description: <br>{{ form.description }}<br>
+				Описание: <br>{{ form.description }}<br>
 			</div>
 
-			<input type="submit" value="Submit" class="btn btn-primary"/>
+			<input type="submit" value="Запази" class="btn btn-primary"/>
 			<!-- {% if error %}
 				{{ error }}
 			{% endif %} -->

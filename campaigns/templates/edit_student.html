@@ -1,21 +1,41 @@
 {% extends 'base.html' %}
  
-{% block title %}Edit existing student{% endblock %}
+{% block title %}Промяна на ученик{% endblock %}
 
 {% block edit_student %}
 
 	<div class="panel panel-primary">
 		<form method="POST" action="/campaigns/{{campaign.id}}/students/{{student.id}}/edit" role="form">
 			{% csrf_token %}
-			First name: <br><input type="text" name="first_name" value="{{ student.first_name }}"><br><br>
+			Първо име: <br><input type="text" name="first_name" value="{{ student.first_name }}"><br><br>
 			
-			Second name: <br><input type="text" name="second_name" value="{{ student.second_name }}"><br><br>
+			Презиме: <br><input type="text" name="second_name" value="{{ student.second_name }}"><br><br>
 			
-			Third name: <br><input type="text" name="third_name" value="{{ student.third_name }}"><br><br>
+			Фамилия: <br><input type="text" name="third_name" value="{{ student.third_name }}"><br><br>
 			
-			EGN: <br><input type="number" name="egn" value="{{ student.egn }}"><br><br>
-			
-			<input type="submit" value="Submit" class="btn btn-primary"/>
+			ЕГН: <br><input type="number" name="egn" value="{{ student.egn }}"><br><br>
+
+			Адрес: <br><input type="text" name="address" value="{{ student.address }}"><br><br>
+
+			Имена на родител: <br><input type="text" name="parent_name" value="{{ student.parent_name }}"><br><br>
+
+			Училище: <br><input type="text" name="previous_school" value="{{ student.previous_school }}"><br><br>
+
+			БЕЛ-Училище: <br><input type="text" name="bel_school" value="{{ student.bel_school }}"><br><br>
+
+			Физика-Училище: <br><input type="text" name="physics_school" value="{{ student.physics_school }}"><br><br>
+
+			БЕЛ-Матура: <br><input type="text" name="bel_exam" value="{{ student.bel_exam }}"><br><br>
+
+			Математика-Матура: <br><input type="text" name="maths_exam" value="{{ student.maths_exam }}"><br><br>
+
+			Математика-ТУЕС: <br><input type="text" name="maths_tues_exam" value="{{ student.maths_tues_exam }}"><br><br>
+
+			Първо желание: <br><input type="text" name="first_choice" value="{{ student.first_choice }}"><br><br>
+
+			Второ желание: <br><input type="text" name="second_choice" value="{{ student.second_choice }}"><br><br>
+
+			<input type="submit" value="Запази" class="btn btn-primary"/>
 			
 			<!-- {% if error %}
 				{{ error }}

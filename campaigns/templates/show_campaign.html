@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}Show existing campaign{% endblock %}
-{% block new_student_link %}<li class="active"><a href="/campaigns/{{ campaign.id }}/students/new">New Student</a></li>{% endblock %}
+{% block title %}Кампания{% endblock %}
+{% block new_student_link %}<li class="active"><a href="/campaigns/{{ campaign.id }}/students/new">Нов Ученик</a></li>{% endblock %}
 
 {% block show_campaign %}
 
@@ -10,17 +10,18 @@
 			<p>{{campaign.description}}</p>
 		</div>
 	</div> -->
-
-	<!-- <a href="/campaigns/{{ campaign.id }}/students/new">New Student</a> -->
-	<!-- DOBAVI LINKA KATO BLOCK V NAV BARA -->
 	<table class="table table-hover table-bordered">	
 		<thead>
 			<tr>
 				<td><b>№</b></td>
-				<td><b>First name</b></td>
-				<td><b>Second name</b></td>
-				<td><b>Third name</b></td>
-				<td><b>EGN</b></td>
+				<td><b>Първо име</b></td>
+				<td><b>Презиме</b></td>
+				<td><b>Фамилия</b></td>
+				<td><b>БЕЛ-Училище</b></td>
+				<td><b>Физика-Училище</b></td>
+				<td><b>БЕЛ-Матура</b></td>
+				<td><b>Математика-Матура</b></td>
+				<td><b>Математика-ТУЕС</b></td>
 				<!-- <td>Show</td> -->
 			</tr>
 		</thead>
@@ -31,7 +32,11 @@
 					<td>{{ s.first_name }}</td>
 					<td>{{ s.second_name }}</td>
 					<td>{{ s.third_name }}</td>
-					<td>{{ s.egn }}</td>
+					<td>{{ s.bel_school }}</td>
+					<td>{{ s.physics_school }}</td>
+					<td>{{ s.bel_exam }}</td>
+					<td>{{ s.maths_exam }}</td>
+					<td>{{ s.maths_tues_exam }}</td>
 					<!-- <td><a href="/campaigns/{{ campaign.id }}/">Show</a></td> -->
 				</tr>
 			{% endfor %}
