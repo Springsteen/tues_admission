@@ -94,13 +94,23 @@ class CampaignsViewsTest(TestCase):
 	# 	response = create_campaign(make_POST_request_for_campaign('',''))
 	# 	self.assertContains(response.content.decode(), EMPTY_CAMPAIGN_FIELDS_ERROR)	
 
-def make_POST_request_for_student(egn, firstName, secondName, thirdName):
+def make_POST_request_for_student():
 	request = HttpRequest()
 	request.method = 'POST'
-	request.POST['egn'] = egn
-	request.POST['first_name'] = firstName
-	request.POST['second_name'] = secondName
-	request.POST['third_name'] = thirdName
+	request.POST['egn'] = 123
+	request.POST['first_name'] = 'Asen'
+	request.POST['second_name'] = 'Asenov'
+	request.POST['third_name'] = 'Asenski'
+	request.POST['address'] = 'address'
+	request.POST['parent_name'] = 'Asen Asenov'
+	request.POST['previous_school'] = 'SOU "ASDF"'
+	request.POST['bel_school'] = 3
+	request.POST['physics_school'] = 4
+	request.POST['bel_exam'] = 5
+	request.POST['maths_exam'] = 4
+	request.POST['maths_tues_exam'] = 5
+	request.POST['first_choice'] = 'SP'
+	request.POST['second_choice'] = 'KM'
 	return request
 
 class StudentViewTest(TestCase):
@@ -115,7 +125,7 @@ class StudentViewTest(TestCase):
 		campaign = Campaign.objects.create(title='a', description='b')
 		self.assertEqual(Student.objects.count(), 0)
 		response = create_student(
-			make_POST_request_for_student(1234554321,'Pesho','Petrov','Popov'),
+			make_POST_request_for_student(),
 			campaign.id
 		)
 		self.assertEqual(Student.objects.count(), 1)
@@ -124,22 +134,22 @@ class StudentViewTest(TestCase):
 			Student.objects.first().campaign
 		)
 		self.assertEqual(Student.objects.first().entry_number, 1)
-		self.assertEqual(Student.objects.first().first_name, 'Pesho')
-		self.assertEqual(Student.objects.first().egn, 1234554321)
+		self.assertEqual(Student.objects.first().first_name, 'Asen')
+		self.assertEqual(Student.objects.first().egn, 123)
 
 	def test_does_create_student_gives_students_appropriate_entry_numbers(self):	
 		campaign = Campaign.objects.create(title='a', description='b')
 		self.assertEqual(Student.objects.count(), 0)
 		create_student(
-			make_POST_request_for_student(1234554321,'Pesho','Petrov','Popov'),
+			make_POST_request_for_student(),
 			campaign.id
 		)
 		create_student(
-			make_POST_request_for_student(5511223344,'Asen','Petrov','Popov'),
+			make_POST_request_for_student(),
 			campaign.id
 		)
 		create_student(
-			make_POST_request_for_student(3399887766,'Gosho','Petrov','Popov'),
+			make_POST_request_for_student(),
 			campaign.id
 		)
 		self.assertEqual(Student.objects.count(), 3)
@@ -153,7 +163,12 @@ class StudentViewTest(TestCase):
 			'/campaigns/%d/students/new' % campaign.id,
 			data={
 				'first_name': 'asen', 'second_name': 'asenov',
-				'third_name': 'asenski', 'egn': '1234567890'
+				'third_name': 'asenski', 'egn': 1234567890,
+				'previous_school': 'adsd', 'parent_name': 'adsad',
+				'address': 'asda', 'bel_school': 4,
+				'physics_school': 5, 'bel_exam': 3,
+				'maths_exam': 4, 'maths_tues_exam': 5,
+				'first_choice': 'sp', 'second_choice': 'km'
 			}
 		)	
 		self.assertRedirects(response, '/campaigns/%d/' % campaign.id)

@@ -42,7 +42,7 @@ def create_student(request, campaign_id):
 		form.save()
 		saved_student = Student.objects.last()
 		saved_student.campaign = Campaign.objects.get(id=campaign_id)
-		saved_student.entry_number = Student.objects.count()
+		saved_student.entry_number = saved_student.campaign.student_set.count()
 		saved_student.save()
 		students = Campaign.objects.get(id=campaign_id).student_set.all()
 		return redirect(Campaign.objects.get(id=campaign_id))
@@ -109,6 +109,18 @@ def export_as_csv(request, campaign_id):
 
 	campaign = Campaign.objects.get(id = campaign_id)
 	students = campaign.student_set.all()	
+	
+	# writer.writerow([
+	#     	'Входящ номер', 'Име', 
+	#     	'Презиме', 'Фамилия',
+	#     	'Адрес', 'Имена на родител',
+	#     	'Училище', 'БЕЛ-Училище',
+	#     	'Физика-Училище', 'БЕЛ-Матура',
+	#     	'Математика-Матура', 'Математика-ТУЕС',
+	#     	'Първо желание', 'Второ желание',
+	#     	'ЕГН'
+	#     ])
+
 	for student in students:
 		writer.writerow([
 	    	student.entry_number, student.first_name, 

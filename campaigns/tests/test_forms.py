@@ -3,11 +3,7 @@ from campaigns.forms import CampaignForm
 from campaigns.models import Campaign
 
 class CamapaignFormTest(TestCase):
-
-	def test_does_form_fields_have_placeholders(self):
-		form = CampaignForm()
-		self.assertIn('placeholder="Enter camapaign title"', form.as_p())
-
+	
 	def test_does_form_saves_campaign_objects_with_given_input(self):
 		self.assertEqual(Campaign.objects.count(), 0)
 		form = CampaignForm(data={
