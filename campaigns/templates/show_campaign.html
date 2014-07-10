@@ -2,6 +2,7 @@
 
 {% block title %}Кампания{% endblock %}
 {% block new_student_link %}<li class="active"><a href="/campaigns/{{ campaign.id }}/students/new">Нов Ученик</a></li>{% endblock %}
+{% block export_as_csv %}<li class="active"><a href="/campaigns/{{ campaign.id }}.csv/">Генерирай CSV</a></li>{% endblock %}
 
 {% block show_campaign %}
 
@@ -22,7 +23,7 @@
 				<td><b>БЕЛ-Матура</b></td>
 				<td><b>Математика-Матура</b></td>
 				<td><b>Математика-ТУЕС</b></td>
-				<!-- <td>Show</td> -->
+				<td></td>
 			</tr>
 		</thead>
 		<tbody>
@@ -37,7 +38,7 @@
 					<td>{{ s.bel_exam }}</td>
 					<td>{{ s.maths_exam }}</td>
 					<td>{{ s.maths_tues_exam }}</td>
-					<!-- <td><a href="/campaigns/{{ campaign.id }}/">Show</a></td> -->
+					<td><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/">Още</a></td>
 				</tr>
 			{% endfor %}
 		</tbody>

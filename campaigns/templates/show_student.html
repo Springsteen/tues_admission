@@ -4,6 +4,8 @@
 
 {% block to_the_campaign %}<li class="active"><a href="/campaigns/{{ campaign.id }}/">Към кампанията</a></li>{% endblock %}
 
+{% block generate_pdf %}<li class="active"><a href="/campaigns/{{ campaign.id }}/students/{{ student.id }}.pdf/">Генерирай формуляр</a></li>{% endblock %}
+
 {% block show_student %}
 	<div class="panel panel-primary">
 		<div class = "panel-body">

@@ -5,6 +5,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
+import csv
+
 
 EMPTY_CAMPAIGN_FIELDS_ERROR = 'There are validation errors in your submitted form'
 
@@ -47,6 +49,7 @@ def create_student(request, campaign_id):
 	else:
 		return render(request, 'create_student.html', {'form': form, 'campaign_id': campaign_id})
 
+@transaction.atomic
 def edit_student(request, campaign_id, student_id):
 	if request.method == 'GET':
 		try:
@@ -98,4 +101,30 @@ def student_as_pdf(request, campaign_id, student_id):
 	p.showPage()
 	p.save()
 	return response
+
+def export_as_csv(request, campaign_id):
+	response = HttpResponse(content_type='text/csv')
+	response['Content-Disposition'] = 'attachment; filename="database.csv"'
+	writer = csv.writer(response)
+
+	campaign = Campaign.objects.get(id = campaign_id)
+	students = campaign.student_set.all()	
+	for student in students:
+		writer.writerow([
+	    	student.entry_number, student.first_name, 
+	    	student.second_name, student.third_name,
+	    	student.address, student.parent_name,
+	    	student.previous_school, student.bel_school,
+	    	student.physics_school, student.bel_exam,
+	    	student.maths_exam, student.maths_tues_exam,
+	    	student.first_choice, student.second_choice,
+	    	student.egn
+	    ])
+
+	return response
+
+
+
+
+
 
