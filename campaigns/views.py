@@ -45,6 +45,37 @@ def create_student(request, campaign_id):
 	else:
 		return render(request, 'create_student.html', {'form': form, 'campaign_id': campaign_id})
 
+def edit_student(request, campaign_id, student_id):
+	if request.method == 'GET':
+		try:
+			student = Student.objects.get(id = student_id)
+			campaign = student.campaign
+			return render(
+				request, 'edit_student.html',
+				{'student': student, 'campaign': campaign}
+			)
+		except ObjectDoesNotExist:
+			# add errors
+			return redirect('/')
+	else:
+		student = Student.objects.get(id = student_id)
+		student.first_name = request.POST['first_name']
+		student.second_name = request.POST['second_name']
+		student.third_name = request.POST['third_name']
+		student.egn = request.POST['egn']
+		print(student.first_name)
+		print(student.second_name)
+		print(student.third_name)
+		print(student.egn)
+		print(student.campaign.id)
+		print(student.entry_number)
+		result = student.save()
+		print(result)
+		if student.save():
+			return redirect(Campaign.objects.get(id = student.campaign.id))
+		else:
+			return redirect('/')
+
 def show_student(request, campaign_id, student_id):
 	campaign = Campaign.objects.get(id = campaign_id)
 	student = Student.objects.get(id = student_id)

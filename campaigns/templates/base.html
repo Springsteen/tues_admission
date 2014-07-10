@@ -6,7 +6,16 @@
 </head>
 
 <body>
-	<nav class="navbar navbar-primary"></nav>
+	<nav class="navbar navbar-default" role="navigation">
+   		<div class="navbar-header">
+      		<a class="navbar-brand" href="http://www.tues.bg">ELSYS</a>
+   		</div>
+   		<div>
+      		<ul class="nav navbar-nav">
+         		{% block new_student_link %}{% endblock %}	
+      		</ul>
+   		</div>
+	</nav>
 
 	<div class = "container">
 		{% block home %}{% endblock %}
@@ -15,6 +24,7 @@
 		{% block list_campaigns %}{% endblock %}
 		{% block create_student %}{% endblock %}
 		{% block show_student %}{% endblock %}
+    {% block edit_student %}{% endblock %}
 	</div>
 
 </body>

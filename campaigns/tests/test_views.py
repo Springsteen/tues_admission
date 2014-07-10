@@ -183,6 +183,22 @@ class StudentViewTest(TestCase):
 		self.assertContains(response, 'Popov')
 		self.assertContains(response, 1234567891)
 
+	def test_does_edit_student_resolves_the_right_url_fields(self):
+		self.assertEqual(Campaign.objects.count(), 0)
+		self.assertEqual(Student.objects.count(), 0)
+		campaign = Campaign.objects.create(title='a', description='b')
+		student = Student.objects.create(
+			campaign=campaign, first_name='Pesho', second_name='Petrov',
+			third_name='Popov', egn = 1234567891, entry_number=1
+		)
+		response = self.client.get('/campaigns/%d/students/%d/edit' % (campaign.id, student.id))
+		self.assertTemplateUsed(response, 'edit_student.html')
+
+	def test_does_edit_student_redirects_to_the_root_url_if_ids_does_not_exist(self):
+		self.assertEqual(Campaign.objects.count(), 0)
+		self.assertEqual(Student.objects.count(), 0)
+		response = self.client.get('/campaigns/%d/students/%d/edit' % (0, 0))
+		self.assertRedirects(response, '/')
 
 
 
