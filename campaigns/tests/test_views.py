@@ -3,7 +3,7 @@ from django.http import HttpRequest
 from campaigns.views import (
 	create_campaign, show_campaign, 
 	list_campaigns, create_student,
-	show_student,
+	show_student, edit_student,
 	EMPTY_CAMPAIGN_FIELDS_ERROR,
 )
 from campaigns.models import Campaign, Student
@@ -215,6 +215,20 @@ class StudentViewTest(TestCase):
 		response = self.client.get('/campaigns/%d/students/%d/edit' % (0, 0))
 		self.assertRedirects(response, '/')
 
+	def test_does_edit_student_saves_the_edited_fields_correctly(self):
+		self.assertEqual(Campaign.objects.count(), 0)
+		self.assertEqual(Student.objects.count(), 0)
+		campaign = Campaign.objects.create(title='a', description='b')
+		student = Student.objects.create(
+			campaign=campaign, first_name='Pesho', second_name='Petrov',
+			third_name='Popov', egn = 1234567891, entry_number=1
+		)
+		response = edit_student(make_POST_request_for_student(), campaign.id, student.id)
+		student = Student.objects.get(id = student.id)
+		self.assertTemplateUsed(response, 'edit_student.html')
+		self.assertEqual(student.first_name, 'Asen')
+		self.assertEqual(student.second_name, 'Asenov')
+		self.assertEqual(student.third_name, 'Asenski')
 
 
 

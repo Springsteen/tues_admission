@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from campaigns.models import Campaign, Student
 from campaigns.forms import CampaignForm, StudentForm
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
@@ -47,10 +47,12 @@ def create_student(request, campaign_id):
 		students = Campaign.objects.get(id=campaign_id).student_set.all()
 		return redirect(Campaign.objects.get(id=campaign_id))
 	else:
+		# ADD ERRORS BY CHECKING WHETER THE REQUEST IS POST OR GET
 		return render(request, 'create_student.html', {'form': form, 'campaign_id': campaign_id})
 
 @transaction.atomic
 def edit_student(request, campaign_id, student_id):
+	print(request)
 	if request.method == 'GET':
 		try:
 			student = Student.objects.get(id = student_id)
@@ -63,22 +65,29 @@ def edit_student(request, campaign_id, student_id):
 			# add errors
 			return redirect('/')
 	else:
+		# very ugly but i know it works
+		# TODO - MAKE IT WITH FORM
 		student = Student.objects.get(id = student_id)
 		student.first_name = request.POST['first_name']
 		student.second_name = request.POST['second_name']
 		student.third_name = request.POST['third_name']
 		student.egn = request.POST['egn']
-		print(student.first_name)
-		print(student.second_name)
-		print(student.third_name)
-		print(student.egn)
-		print(student.campaign.id)
-		print(student.entry_number)
-		result = student.save()
-		print(result)
-		if student.save():
+		student.address = request.POST['address']
+		student.previous_school = request.POST['previous_school']
+		student.parent_name = request.POST['parent_name']
+		student.bel_school = request.POST['bel_school']
+		student.physics_school = request.POST['physics_school']
+		student.bel_exam = request.POST['bel_exam']
+		student.maths_exam = request.POST['maths_exam']
+		student.maths_tues_exam = request.POST['maths_tues_exam']
+		student.first_choice = request.POST['first_choice']
+		student.second_choice = request.POST['second_choice']
+		try:	
+			student.full_clean()
+			student.save()
 			return redirect(Campaign.objects.get(id = student.campaign.id))
-		else:
+		except ValidationError:
+			# add errors and redirect to back to the form insteed of home
 			return redirect('/')
 
 def show_student(request, campaign_id, student_id):
@@ -110,16 +119,16 @@ def export_as_csv(request, campaign_id):
 	campaign = Campaign.objects.get(id = campaign_id)
 	students = campaign.student_set.all()	
 	
-	# writer.writerow([
-	#     	'Входящ номер', 'Име', 
-	#     	'Презиме', 'Фамилия',
-	#     	'Адрес', 'Имена на родител',
-	#     	'Училище', 'БЕЛ-Училище',
-	#     	'Физика-Училище', 'БЕЛ-Матура',
-	#     	'Математика-Матура', 'Математика-ТУЕС',
-	#     	'Първо желание', 'Второ желание',
-	#     	'ЕГН'
-	#     ])
+	writer.writerow([
+	    	'Входящ номер', 'Име', 
+	    	'Презиме', 'Фамилия',
+	    	'Адрес', 'Имена на родител',
+	    	'Училище', 'БЕЛ-Училище',
+	    	'Физика-Училище', 'БЕЛ-Матура',
+	    	'Математика-Матура', 'Математика-ТУЕС',
+	    	'Първо желание', 'Второ желание',
+	    	'ЕГН'
+	    ])
 
 	for student in students:
 		writer.writerow([
