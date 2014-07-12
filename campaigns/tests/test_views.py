@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.http import HttpRequest
 from django.test import TestCase
@@ -10,7 +11,18 @@ from campaigns.views import (
 	EMPTY_CAMPAIGN_FIELDS_ERROR,
 )
 
-class HomePageTest(TestCase):
+class Base(TestCase):
+
+	def setUp(self):
+		User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
+		self.user = authenticate(username='john', password='johnpassword')
+
+
+	def tearDown(self):
+		User.objects.get(id = self.user.id).delete()
+
+
+class HomePageTest(Base):
 
 	def test_does_root_url_resolves_the_home_page(self):
 		called = self.client.get('/')
@@ -23,16 +35,18 @@ class HomePageTest(TestCase):
 	def test_does_home_page_does_not_contain_login_form_if_user_is_authenticated(self):
 		pass
 
-def make_POST_request_for_campaign(titleValue, descriptionValue):
+def make_POST_request_for_campaign(titleValue, descriptionValue, user):
 	request = HttpRequest()
 	request.method = 'POST'
 	request.POST['title'] = titleValue
 	request.POST['description'] = descriptionValue
+	request.user = user
 	return request
 
-class CampaignsViewsTest(TestCase):
+class CampaignsViewsTest(Base):
 
 	def test_does_create_campaign_resolves_the_right_url(self):
+		self.client.login(username='john', password='johnpassword')
 		called = self.client.get('/campaigns/new')
 		self.assertTemplateUsed(called, 'new_campaign.html')
 
@@ -40,7 +54,7 @@ class CampaignsViewsTest(TestCase):
 	# reason so i made it that ugly
 	def test_does_create_campaign_saves_objects_with_POST_requests(self):
 		self.assertEqual(Campaign.objects.count(), 0)
-		create_campaign(make_POST_request_for_campaign('C1', 'C1Descr'))
+		create_campaign(make_POST_request_for_campaign('C1', 'C1Descr', self.user))
 		campaign = Campaign.objects.first()
 		self.assertEqual(Campaign.objects.count(), 1)
 		self.assertEqual(campaign.title, 'C1')
@@ -48,10 +62,11 @@ class CampaignsViewsTest(TestCase):
 
 	def test_create_campaign_dont_saves_empty_objects(self):
 		self.assertEqual(Campaign.objects.count(), 0)
-		create_campaign(make_POST_request_for_campaign('', ''))
+		create_campaign(make_POST_request_for_campaign('', '', self.user))
 		self.assertEqual(Campaign.objects.count(), 0)
 
 	def test_create_campaign_redirects_to_show_campaign_on_success(self):
+		self.client.login(username='john', password='johnpassword')
 		self.assertEqual(Campaign.objects.count(), 0)
 		response = self.client.post(
             '/campaigns/new',
@@ -62,6 +77,7 @@ class CampaignsViewsTest(TestCase):
 		self.assertRedirects(response, '/campaigns/%d/' % campaign.id)
 
 	def test_does_show_campaign_resolves_the_right_url(self):
+		self.client.login(username='john', password='johnpassword')
 		campaign = Campaign.objects.create(title = 'a', description = 'b')
 		called = self.client.get('/campaigns/%d/' % (campaign.id,))
 		self.assertTemplateUsed(called, 'show_campaign.html')
@@ -71,6 +87,7 @@ class CampaignsViewsTest(TestCase):
 		self.assertRedirects(response, '/')
 
 	def test_does_show_campaign_list_title_and_description_if_campaign_exist(self):
+		self.client.login(username='john', password='johnpassword')
 		self.assertEqual(Campaign.objects.count(),0)
 		campaign = Campaign.objects.create(title = 'alright', description = 'base')
 		self.assertEqual(Campaign.objects.count(),1)
@@ -85,6 +102,7 @@ class CampaignsViewsTest(TestCase):
 		# student1 = Student.objects.create()
 
 	def test_does_list_campaigns_resolves_the_right_url(self):
+		self.client.login(username='john', password='johnpassword')
 		called = self.client.get('/campaigns')
 		self.assertTemplateUsed(called, 'list_campaigns.html')
 
@@ -93,7 +111,9 @@ class CampaignsViewsTest(TestCase):
 		Campaign.objects.create(title = 'first', description='first_d').save()
 		Campaign.objects.create(title = 'second', description='second_d').save()
 		self.assertEqual(Campaign.objects.count(), 2)
-		response = list_campaigns(HttpRequest())
+		request = HttpRequest()
+		request.user = self.user
+		response = list_campaigns(request)
 		self.assertContains(response,'first')
 		self.assertContains(response,'second_d')
 
@@ -101,7 +121,7 @@ class CampaignsViewsTest(TestCase):
 	# 	response = create_campaign(make_POST_request_for_campaign('',''))
 	# 	self.assertContains(response.content.decode(), EMPTY_CAMPAIGN_FIELDS_ERROR)	
 
-def make_POST_request_for_student():
+def make_POST_request_for_student(user):
 	request = HttpRequest()
 	request.method = 'POST'
 	request.POST['egn'] = 123
@@ -118,11 +138,13 @@ def make_POST_request_for_student():
 	request.POST['maths_tues_exam'] = 5
 	request.POST['first_choice'] = 'SP'
 	request.POST['second_choice'] = 'KM'
+	request.user = user
 	return request
 
-class StudentViewTest(TestCase):
+class StudentViewTest(Base):
 
 	def test_does_create_student_resolves_the_right_url(self):
+		self.client.login(username='john', password='johnpassword')
 		campaign = Campaign.objects.create(title='a', description='b')
 		campaign.save()
 		called = self.client.get('/campaigns/%d/students/new' % campaign.id)
@@ -132,7 +154,7 @@ class StudentViewTest(TestCase):
 		campaign = Campaign.objects.create(title='a', description='b')
 		self.assertEqual(Student.objects.count(), 0)
 		response = create_student(
-			make_POST_request_for_student(),
+			make_POST_request_for_student(self.user),
 			campaign.id
 		)
 		self.assertEqual(Student.objects.count(), 1)
@@ -148,15 +170,15 @@ class StudentViewTest(TestCase):
 		campaign = Campaign.objects.create(title='a', description='b')
 		self.assertEqual(Student.objects.count(), 0)
 		create_student(
-			make_POST_request_for_student(),
+			make_POST_request_for_student(self.user),
 			campaign.id
 		)
 		create_student(
-			make_POST_request_for_student(),
+			make_POST_request_for_student(self.user),
 			campaign.id
 		)
 		create_student(
-			make_POST_request_for_student(),
+			make_POST_request_for_student(self.user),
 			campaign.id
 		)
 		self.assertEqual(Student.objects.count(), 3)
@@ -165,6 +187,7 @@ class StudentViewTest(TestCase):
 			self.assertEqual(s.entry_number, i+1)	
 
 	def test_does_create_student_redirects_to_the_campaign_he_belongs_to(self):
+		self.client.login(username='john', password='johnpassword')
 		campaign = Campaign.objects.create(title='a', description='b')
 		response = self.client.post(
 			'/campaigns/%d/students/new' % campaign.id,
@@ -181,6 +204,7 @@ class StudentViewTest(TestCase):
 		self.assertRedirects(response, '/campaigns/%d/' % campaign.id)
 
 	def test_does_show_student_resolves_the_right_url(self):
+		self.client.login(username='john', password='johnpassword')
 		self.assertEqual(Campaign.objects.count(), 0)
 		self.assertEqual(Student.objects.count(), 0)
 		campaign = Campaign.objects.create(title='a', description='b')
@@ -199,13 +223,16 @@ class StudentViewTest(TestCase):
 			campaign=campaign, first_name='Pesho', second_name='Petrov',
 			third_name='Popov', egn = 1234567891, entry_number=1
 		)
-		response = show_student(HttpRequest(), campaign.id, student.id)
+		request = HttpRequest()
+		request.user = self.user
+		response = show_student(request, campaign.id, student.id)
 		self.assertContains(response, 'Pesho')
 		self.assertContains(response, 'Petrov')
 		self.assertContains(response, 'Popov')
 		self.assertContains(response, 1234567891)
 
 	def test_does_edit_student_resolves_the_right_url_fields(self):
+		self.client.login(username='john', password='johnpassword')
 		self.assertEqual(Campaign.objects.count(), 0)
 		self.assertEqual(Student.objects.count(), 0)
 		campaign = Campaign.objects.create(title='a', description='b')
@@ -217,6 +244,7 @@ class StudentViewTest(TestCase):
 		self.assertTemplateUsed(response, 'edit_student.html')
 
 	def test_does_edit_student_redirects_to_the_root_url_if_ids_does_not_exist(self):
+		self.client.login(username='john', password='johnpassword')
 		self.assertEqual(Campaign.objects.count(), 0)
 		self.assertEqual(Student.objects.count(), 0)
 		response = self.client.get('/campaigns/%d/students/%d/edit' % (0, 0))
@@ -230,7 +258,7 @@ class StudentViewTest(TestCase):
 			campaign=campaign, first_name='Pesho', second_name='Petrov',
 			third_name='Popov', egn = 1234567891, entry_number=1
 		)
-		response = edit_student(make_POST_request_for_student(), campaign.id, student.id)
+		response = edit_student(make_POST_request_for_student(self.user), campaign.id, student.id)
 		student = Student.objects.get(id = student.id)
 		self.assertTemplateUsed(response, 'edit_student.html')
 		self.assertEqual(student.first_name, 'Asen')

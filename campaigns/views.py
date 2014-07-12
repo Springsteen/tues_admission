@@ -138,11 +138,8 @@ def student_as_pdf(request, campaign_id, student_id):
 		student = Student.objects.get(id = student_id)
 
 		p = canvas.Canvas(response)
-
-		p.drawString(100, 100, student.first_name)
-		p.drawString(100, 200, student.second_name)
-		p.drawString(100, 300, student.third_name)
-		p.drawString(100, 400, str(student.egn))
+		p.setFont('Courier', 12)
+		p.drawString(0, 820, 'Входящ номер %d' % student.id)
 
 		p.showPage()
 		p.save()
