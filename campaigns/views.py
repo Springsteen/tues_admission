@@ -1,17 +1,34 @@
 from django.shortcuts import render, redirect
-from campaigns.models import Campaign, Student
-from campaigns.forms import CampaignForm, StudentForm
+from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db import transaction
 from django.http import HttpResponse
+from django.db import transaction
+from campaigns.forms import CampaignForm, StudentForm
+from campaigns.models import Campaign, Student
 from reportlab.pdfgen import canvas
 import csv
-
 
 EMPTY_CAMPAIGN_FIELDS_ERROR = 'There are validation errors in your submitted form'
 
 def home(request):
-	return render(request, 'home.html')
+	if request.method == 'GET':
+		return render(request, 'home.html')
+	else:
+		username = request.POST['username']
+		password = request.POST['password']
+		user = authenticate(username=username, password=password)
+		if user is not None:
+			if user.is_active:
+				login(request, user)
+				return redirect('/')
+			else:
+				return redirect('/')
+		else:
+			return redirect('/')
+
+def logout_user(request):
+	logout(request)
+	return redirect('/')
 
 @transaction.atomic
 def create_campaign(request):
@@ -44,6 +61,8 @@ def create_student(request, campaign_id):
 		saved_student.campaign = Campaign.objects.get(id=campaign_id)
 		saved_student.entry_number = saved_student.campaign.student_set.count()
 		saved_student.save()
+		# form.save() is not saving the student.campaign property so im doing it
+		# manually, TODO - try refactor this
 		students = Campaign.objects.get(id=campaign_id).student_set.all()
 		return redirect(Campaign.objects.get(id=campaign_id))
 	else:
@@ -52,7 +71,6 @@ def create_student(request, campaign_id):
 
 @transaction.atomic
 def edit_student(request, campaign_id, student_id):
-	print(request)
 	if request.method == 'GET':
 		try:
 			student = Student.objects.get(id = student_id)
@@ -119,6 +137,7 @@ def export_as_csv(request, campaign_id):
 	campaign = Campaign.objects.get(id = campaign_id)
 	students = campaign.student_set.all()	
 	
+	#Student objects are not itterable so im writing the file this way
 	writer.writerow([
 	    	'Входящ номер', 'Име', 
 	    	'Презиме', 'Фамилия',

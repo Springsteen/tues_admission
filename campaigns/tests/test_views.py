@@ -1,20 +1,27 @@
-from django.test import TestCase
+from django.contrib.auth import authenticate, login
 from django.http import HttpRequest
+from django.test import TestCase
+from campaigns.models import Campaign, Student
+from campaigns.forms import CampaignForm
 from campaigns.views import (
 	create_campaign, show_campaign, 
 	list_campaigns, create_student,
 	show_student, edit_student,
 	EMPTY_CAMPAIGN_FIELDS_ERROR,
 )
-from campaigns.models import Campaign, Student
-from campaigns.forms import CampaignForm
-
 
 class HomePageTest(TestCase):
 
 	def test_does_root_url_resolves_the_home_page(self):
 		called = self.client.get('/')
 		self.assertTemplateUsed(called, 'home.html')
+
+	def test_does_logout_redirects_to_the_home_page(self):
+		response = self.client.get('/logout')
+		self.assertRedirects(response, '/')
+
+	def test_does_home_page_does_not_contain_login_form_if_user_is_authenticated(self):
+		pass
 
 def make_POST_request_for_campaign(titleValue, descriptionValue):
 	request = HttpRequest()

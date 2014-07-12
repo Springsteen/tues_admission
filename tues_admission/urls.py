@@ -3,6 +3,7 @@ from django.contrib import admin
 
 urlpatterns = patterns('',
     url(r'^$', 'campaigns.views.home', name='home'),
+    url(r'^logout$', 'campaigns.views.logout_user', name='logout_user'),
     url(r'^campaigns$', 'campaigns.views.list_campaigns', name='list_campaigns'),
     url(r'^campaigns/new$', 'campaigns.views.create_campaign', name='create_campaign'),
     url(r'^campaigns/(\d+)/$', 'campaigns.views.show_campaign', name='show_campaign'),

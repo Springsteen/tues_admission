@@ -6,4 +6,13 @@
 	<div>
 		<h1><span class = "label label-primary center-block">ТУЕС ЗАПИСВАНЕ</span></h1>
 	</div>
+
+	{% if not user.is_authenticated %}
+		<form method="post" action="/">
+			{% csrf_token %}
+			<input name="username" id="id_username" class="form-control input-lg"/>
+			<input name="password" id="id_password" class="form-control input-lg"/>
+			<input type="submit" value="Вход" />
+		</form>
+	{% endif %}
 {% endblock %}

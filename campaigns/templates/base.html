@@ -14,11 +14,17 @@
         		<ul class="nav navbar-nav">
                 <li class="active"><a href="/campaigns/new">Нова кампания</a></li>
                 <li class="active"><a href="/campaigns">Всички кампании</a></li>
-           		  {% block new_student_link %}{% endblock %}	
-        		    {% block to_the_campaign %}{% endblock %}
+                {% block new_student_link %}{% endblock %}  
+                {% block to_the_campaign %}{% endblock %}
                 {% block generate_pdf %}{% endblock %}
                 {% block export_as_csv %}{% endblock %}
             </ul>
+                
+            {% if user.is_authenticated %}
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="active"><a href="/logout">Изход</a></li>
+                </ul>
+            {% endif %}
      		</div>
   	</nav>
 
