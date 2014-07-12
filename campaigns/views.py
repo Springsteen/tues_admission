@@ -67,10 +67,14 @@ def create_student(request, campaign_id):
 		form = StudentForm(request.POST)
 		if form.is_valid():
 			form.save()
-			saved_student = Student.objects.last()
-			saved_student.campaign = Campaign.objects.get(id=campaign_id)
-			saved_student.entry_number = saved_student.campaign.student_set.count()
-			saved_student.save()
+			s = Student.objects.last()
+			s.campaign = Campaign.objects.get(id=campaign_id)
+			s.entry_number = s.campaign.student_set.count()
+			s.grades_evaluated = (
+				s.bel_school + s.physics_school + s.bel_exam +
+				s.maths_exam + s.maths_tues_exam 
+			)
+			s.save()
 			# form.save() is not saving the student.campaign property so im doing it
 			# manually, TODO - try refactor this
 			students = Campaign.objects.get(id=campaign_id).student_set.all()
@@ -113,6 +117,10 @@ def edit_student(request, campaign_id, student_id):
 			student.maths_tues_exam = request.POST['maths_tues_exam']
 			student.first_choice = request.POST['first_choice']
 			student.second_choice = request.POST['second_choice']
+			student.grades_evaluated = (
+				student.bel_school + student.physics_school + student.bel_exam +
+				student.maths_exam + student.maths_tues_exam 
+			)
 			try:	
 				student.full_clean()
 				student.save()

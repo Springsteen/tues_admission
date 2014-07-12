@@ -265,6 +265,33 @@ class StudentViewTest(Base):
 		self.assertEqual(student.second_name, 'Asenov')
 		self.assertEqual(student.third_name, 'Asenski')
 
+	def test_does_create_student_evaluates_the_given_grades_and_saves_the_result(self):
+		self.assertEqual(Campaign.objects.count(), 0)
+		self.assertEqual(Student.objects.count(), 0)
+		campaign = Campaign.objects.create(title='a', description='b')
+		create_student(
+			make_POST_request_for_student(self.user),
+			campaign.id
+		)
+		saved_student = Student.objects.first()
+		self.assertEqual(saved_student.grades_evaluated, 21.0)
+
+	def test_does_create_student_evaluates_the_given_grades_and_saves_the_result(self):
+		self.assertEqual(Campaign.objects.count(), 0)
+		self.assertEqual(Student.objects.count(), 0)
+		campaign = Campaign.objects.create(title='a', description='b')
+		create_student(
+			make_POST_request_for_student(self.user),
+			campaign.id
+		)
+		saved_student = Student.objects.first()
+		request = make_POST_request_for_student(self.user)
+		request.POST['bel_school'] = 4
+		request.POST['physics_school'] = 5
+		edit_student(request, campaign.id, saved_student.id)
+		saved_student = Student.objects.get(id = saved_student.id)
+		self.assertEqual(saved_student.grades_evaluated, 23.0)
+
 
 
 

@@ -27,3 +27,6 @@ class Student(models.Model):
 	maths_tues_exam = models.FloatField(default=0, blank=True)
 	first_choice = models.CharField(max_length=2, default='', blank=True)
 	second_choice = models.CharField(max_length=2, default='', blank=True)
+
+	grades_evaluated = models.FloatField(default=0, blank=True)
+
