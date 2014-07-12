@@ -72,7 +72,7 @@ def create_student(request, campaign_id):
 			s.entry_number = s.campaign.student_set.count()
 			s.grades_evaluated = (
 				s.bel_school + s.physics_school + s.bel_exam +
-				s.maths_exam + s.maths_tues_exam 
+				s.maths_exam + (4 * s.maths_tues_exam) 
 			)
 			s.save()
 			# form.save() is not saving the student.campaign property so im doing it
@@ -119,7 +119,7 @@ def edit_student(request, campaign_id, student_id):
 			student.second_choice = request.POST['second_choice']
 			student.grades_evaluated = (
 				student.bel_school + student.physics_school + student.bel_exam +
-				student.maths_exam + student.maths_tues_exam 
+				student.maths_exam + (4 * student.maths_tues_exam) 
 			)
 			try:	
 				student.full_clean()

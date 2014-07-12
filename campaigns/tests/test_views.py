@@ -274,7 +274,7 @@ class StudentViewTest(Base):
 			campaign.id
 		)
 		saved_student = Student.objects.first()
-		self.assertEqual(saved_student.grades_evaluated, 21.0)
+		self.assertEqual(saved_student.grades_evaluated, 36.0)
 
 	def test_does_create_student_evaluates_the_given_grades_and_saves_the_result(self):
 		self.assertEqual(Campaign.objects.count(), 0)
@@ -290,7 +290,7 @@ class StudentViewTest(Base):
 		request.POST['physics_school'] = 5
 		edit_student(request, campaign.id, saved_student.id)
 		saved_student = Student.objects.get(id = saved_student.id)
-		self.assertEqual(saved_student.grades_evaluated, 23.0)
+		self.assertEqual(saved_student.grades_evaluated, 38.0)
 
 
 
