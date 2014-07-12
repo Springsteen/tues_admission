@@ -124,7 +124,7 @@ class CampaignsViewsTest(Base):
 def make_POST_request_for_student(user):
 	request = HttpRequest()
 	request.method = 'POST'
-	request.POST['egn'] = 123
+	request.POST['egn'] = '0011223344'
 	request.POST['first_name'] = 'Asen'
 	request.POST['second_name'] = 'Asenov'
 	request.POST['third_name'] = 'Asenski'
@@ -164,7 +164,7 @@ class StudentViewTest(Base):
 		)
 		self.assertEqual(Student.objects.first().entry_number, 1)
 		self.assertEqual(Student.objects.first().first_name, 'Asen')
-		self.assertEqual(Student.objects.first().egn, 123)
+		self.assertEqual(Student.objects.first().egn, '0011223344')
 
 	def test_does_create_student_gives_students_appropriate_entry_numbers(self):	
 		campaign = Campaign.objects.create(title='a', description='b')
@@ -193,7 +193,7 @@ class StudentViewTest(Base):
 			'/campaigns/%d/students/new' % campaign.id,
 			data={
 				'first_name': 'asen', 'second_name': 'asenov',
-				'third_name': 'asenski', 'egn': 1234567890,
+				'third_name': 'asenski', 'egn': '1234567890',
 				'previous_school': 'adsd', 'parent_name': 'adsad',
 				'address': 'asda', 'bel_school': 4,
 				'physics_school': 5, 'bel_exam': 3,
@@ -210,7 +210,7 @@ class StudentViewTest(Base):
 		campaign = Campaign.objects.create(title='a', description='b')
 		student = Student.objects.create(
 			campaign=campaign, first_name='Pesho', second_name='Petrov',
-			third_name='Popov', egn = 1234567891, entry_number=1
+			third_name='Popov', egn = '1234567891', entry_number=1
 		)
 		response = self.client.get('/campaigns/%d/students/%d/' % (campaign.id, student.id))
 		self.assertTemplateUsed(response, 'show_student.html')
@@ -221,7 +221,7 @@ class StudentViewTest(Base):
 		campaign = Campaign.objects.create(title='a', description='b')
 		student = Student.objects.create(
 			campaign=campaign, first_name='Pesho', second_name='Petrov',
-			third_name='Popov', egn = 1234567891, entry_number=1
+			third_name='Popov', egn = '1234567891', entry_number=1
 		)
 		request = HttpRequest()
 		request.user = self.user
@@ -229,7 +229,7 @@ class StudentViewTest(Base):
 		self.assertContains(response, 'Pesho')
 		self.assertContains(response, 'Petrov')
 		self.assertContains(response, 'Popov')
-		self.assertContains(response, 1234567891)
+		self.assertContains(response, '1234567891')
 
 	def test_does_edit_student_resolves_the_right_url_fields(self):
 		self.client.login(username='john', password='johnpassword')
@@ -238,7 +238,7 @@ class StudentViewTest(Base):
 		campaign = Campaign.objects.create(title='a', description='b')
 		student = Student.objects.create(
 			campaign=campaign, first_name='Pesho', second_name='Petrov',
-			third_name='Popov', egn = 1234567891, entry_number=1
+			third_name='Popov', egn = '1234567891', entry_number=1
 		)
 		response = self.client.get('/campaigns/%d/students/%d/edit' % (campaign.id, student.id))
 		self.assertTemplateUsed(response, 'edit_student.html')
@@ -256,7 +256,7 @@ class StudentViewTest(Base):
 		campaign = Campaign.objects.create(title='a', description='b')
 		student = Student.objects.create(
 			campaign=campaign, first_name='Pesho', second_name='Petrov',
-			third_name='Popov', egn = 1234567891, entry_number=1
+			third_name='Popov', egn = '1234567891', entry_number=1
 		)
 		response = edit_student(make_POST_request_for_student(self.user), campaign.id, student.id)
 		student = Student.objects.get(id = student.id)

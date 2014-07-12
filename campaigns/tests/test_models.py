@@ -10,7 +10,7 @@ class CampaignsModelsTest(TestCase):
 		student.first_name = 'Random'
 		student.second_name = 'Randomer'
 		student.third_name = 'Randomizer'
-		student.egn = 1234567890
+		student.egn = '1234567890'
 		student.save()
 		new_student = Student.objects.first()
-		self.assertEqual(new_student.egn, 1234567890)
+		self.assertEqual(new_student.egn, '1234567890')

@@ -36,7 +36,7 @@ class StudentForm(forms.models.ModelForm):
             'third_name': forms.fields.TextInput(attrs={
                 'class': '',
             }),
-            'egn': forms.fields.NumberInput(attrs={
+            'egn': forms.fields.TextInput(attrs={
                 'class': '',
             }),
             'address': forms.fields.TextInput(attrs={
