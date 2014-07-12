@@ -24,6 +24,8 @@
 				<td><b>Математика-Матура</b></td>
 				<td><b>Математика-ТУЕС</b></td>
 				<td></td>
+				<td></td>
+				<td></td>
 			</tr>
 		</thead>
 		<tbody>
@@ -38,7 +40,9 @@
 					<td>{{ s.bel_exam }}</td>
 					<td>{{ s.maths_exam }}</td>
 					<td>{{ s.maths_tues_exam }}</td>
-					<td><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/">Още</a></td>
+					<td><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/">Още данни</a></td>
+					<td><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/edit">Промени</a></td>
+					<td><a href="/campaigns/{{ campaign.id }}/students/{{ s.id }}.pdf/">Генерирай формуляр</a></td>
 				</tr>
 			{% endfor %}
 		</tbody>
