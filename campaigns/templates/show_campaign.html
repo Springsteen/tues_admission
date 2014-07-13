@@ -3,6 +3,7 @@
 {% block title %}Кампания{% endblock %}
 {% block new_student_link %}<li class="active"><a href="/campaigns/{{ campaign.id }}/students/new">Нов Ученик</a></li>{% endblock %}
 {% block export_as_csv %}<li class="active"><a href="/campaigns/{{ campaign.id }}.csv/">Генерирай CSV</a></li>{% endblock %}
+{% block populate_halls_link %}<li class="active"><a href="/campaigns/{{ campaign.id }}/halls">Разпредели по зали</a></li>{% endblock %}
 
 {% block show_campaign %}
 

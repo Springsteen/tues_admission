@@ -4,8 +4,10 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpResponse
 from django.db import transaction
 from campaigns.forms import CampaignForm, StudentForm
-from campaigns.models import Campaign, Student
+from campaigns.models import Campaign, Student, Hall
 from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 import csv
 
 EMPTY_CAMPAIGN_FIELDS_ERROR = 'There are validation errors in your submitted form'
@@ -75,8 +77,6 @@ def create_student(request, campaign_id):
 				s.maths_exam + (4 * s.maths_tues_exam) 
 			)
 			s.save()
-			# form.save() is not saving the student.campaign property so im doing it
-			# manually, TODO - try refactor this
 			students = Campaign.objects.get(id=campaign_id).student_set.all()
 			return redirect(Campaign.objects.get(id=campaign_id))
 		else:
@@ -144,9 +144,12 @@ def student_as_pdf(request, campaign_id, student_id):
 		response = HttpResponse(content_type='application/pdf')
 		response['Content-Disposition'] = ('attachment; filename="%s.pdf"' % student_id)
 		student = Student.objects.get(id = student_id)
+		enc = 'UTF-8'
+		pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf',enc))
+		pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf',enc))
 
 		p = canvas.Canvas(response)
-		p.setFont('Courier', 12)
+		p.setFont('DejaVuSans', 12)
 		p.drawString(0, 820, 'Входящ номер %d' % student.id)
 
 		p.showPage()
@@ -154,6 +157,42 @@ def student_as_pdf(request, campaign_id, student_id):
 		return response
 	else:
 		return redirect('/')
+
+def create_hall(request, campaign_id):
+	if request.method == 'GET':
+		return render(request, 'create_hall.html', {'campaign_id': campaign_id})
+	else:
+		try:
+			hall = Hall.objects.create(
+				name=request.POST['name'], 
+				capacity=request.POST['capacity']
+			)
+			hall.campaign = Campaign.objects.get(id = campaign_id)
+			hall.save()
+			return redirect('/campaigns/%s/' % campaign_id)
+		except ValidationError:
+			return redirect('/')
+
+
+def populate_halls(request, campaign_id):
+	result = check_for_capacity(
+		Campaign.objects.get(id = campaign_id).hall_set.all(),
+		Campaign.objects.get(id = campaign_id).student_set.count()
+	)
+	if result:
+		populate(
+			Campaign.objects.get(id = campaign_id).hall_set.all(), 
+			Campaign.objects.get(id = campaign_id).student_set.all()
+		)
+		return render(request, 'populate_halls.html', {
+			'students' : Campaign.objects.get(id = campaign_id).student_set.all(),
+			'campaign_id' : campaign_id
+		})
+	else:
+		return render(request, 'show_campaign.html', {
+			'campaign': Campaign.objects.get(id = campaign_id), 
+			'students': Campaign.objects.get(id = campaign_id).student_set.all()
+		})
 
 def export_as_csv(request, campaign_id):
 	if request.user.is_authenticated():	
@@ -193,6 +232,22 @@ def export_as_csv(request, campaign_id):
 		return redirect('/')
 
 
+def check_for_capacity(hall_set, students):
+	cap = 0
+	for h in hall_set:
+		cap += h.capacity
+	return cap > students
+
+def populate(hall_set, students):
+	for i,s in enumerate(students):
+		hallIndex = i % hall_set.count()
+		while not (hall_set[hallIndex].student_set.count() < hall_set[hallIndex].capacity):
+			if hallIndex < hall_set.count():
+				hallIndex+=1
+			else:
+				return
+		s.hall = hall_set[hallIndex]
+		s.save()
 
 
 

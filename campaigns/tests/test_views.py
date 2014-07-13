@@ -2,12 +2,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.http import HttpRequest
 from django.test import TestCase
-from campaigns.models import Campaign, Student
+from campaigns.models import Campaign, Student, Hall
 from campaigns.forms import CampaignForm
 from campaigns.views import (
 	create_campaign, show_campaign, 
 	list_campaigns, create_student,
 	show_student, edit_student,
+	create_hall,
 	EMPTY_CAMPAIGN_FIELDS_ERROR,
 )
 
@@ -34,6 +35,43 @@ class HomePageTest(Base):
 
 	def test_does_home_page_does_not_contain_login_form_if_user_is_authenticated(self):
 		pass
+
+
+class HallPopulationTest(Base):
+
+	def test_does_populate_halls_resolves_the_right_url(self):
+		campaign = Campaign.objects.create(title = 'a', description = 'b')
+		hall = Hall.objects.create(name='abv', capacity=50, campaign = campaign)
+		called = self.client.get('/campaigns/%d/halls' % campaign.id)
+		self.assertTemplateUsed(called, 'populate_halls.html')
+
+	def test_does_populate_halls_renders_show_campaign_if_there_isnt_enough_capacity(self):
+		campaign = Campaign.objects.create(title = 'a', description = 'b')
+		self.assertEqual(campaign.hall_set.count(), 0)
+		response = self.client.get('/campaigns/%d/halls' % campaign.id)
+		self.assertTemplateUsed(response, 'show_campaign.html')
+
+def make_POST_request_for_hall(user):
+	request = HttpRequest()
+	request.method = 'POST'
+	request.POST['name'] = 'hall1'
+	request.POST['capacity'] = 10
+	request.user = user
+	return request
+
+class HallsViewsTest(Base):
+
+	def test_does_create_hall_resolves_the_right_url(self):
+		campaign = Campaign.objects.create(title = 'a', description = 'b')
+		called = self.client.get('/campaigns/%d/halls/new' % campaign.id)
+		self.assertTemplateUsed(called, 'create_hall.html')	
+
+	def test_does_create_hall_creates_new_hall_object_with_POST_request(self):
+		campaign = Campaign.objects.create(title = 'a', description = 'b')
+		self.assertEqual(Hall.objects.count(), 0)
+		create_hall(make_POST_request_for_hall(self.user), campaign.id)
+		self.assertEqual(Hall.objects.count(), 1)
+
 
 def make_POST_request_for_campaign(titleValue, descriptionValue, user):
 	request = HttpRequest()
@@ -122,6 +160,8 @@ class CampaignsViewsTest(Base):
 	# 	self.assertContains(response.content.decode(), EMPTY_CAMPAIGN_FIELDS_ERROR)	
 
 def make_POST_request_for_student(user):
+	h = Hall.objects.create(name='a', capacity = 10)
+	h.save()
 	request = HttpRequest()
 	request.method = 'POST'
 	request.POST['egn'] = '0011223344'

@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Campaign',
             fields=[
-                ('id', models.AutoField(auto_created=True, serialize=False, verbose_name='ID', primary_key=True)),
+                ('id', models.AutoField(serialize=False, primary_key=True, verbose_name='ID', auto_created=True)),
                 ('title', models.CharField(default='', max_length=40)),
                 ('description', models.TextField(default='', max_length=500)),
             ],
@@ -22,9 +22,21 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
+            name='Hall',
+            fields=[
+                ('id', models.AutoField(serialize=False, primary_key=True, verbose_name='ID', auto_created=True)),
+                ('name', models.CharField(default='', max_length=10)),
+                ('capacity', models.IntegerField(default=0)),
+                ('campaign', models.ForeignKey(to='campaigns.Campaign', default=1)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
             name='Student',
             fields=[
-                ('id', models.AutoField(auto_created=True, serialize=False, verbose_name='ID', primary_key=True)),
+                ('id', models.AutoField(serialize=False, primary_key=True, verbose_name='ID', auto_created=True)),
                 ('egn', models.CharField(default='', max_length=10)),
                 ('entry_number', models.IntegerField(default=0)),
                 ('first_name', models.CharField(default='', max_length=30)),
@@ -42,6 +54,7 @@ class Migration(migrations.Migration):
                 ('second_choice', models.CharField(default='', blank=True, max_length=2)),
                 ('grades_evaluated', models.FloatField(default=0, blank=True)),
                 ('campaign', models.ForeignKey(to='campaigns.Campaign', default=1)),
+                ('hall', models.ForeignKey(default=1, blank=True, to='campaigns.Hall')),
             ],
             options={
             },

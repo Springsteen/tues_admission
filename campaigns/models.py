@@ -9,8 +9,15 @@ class Campaign(models.Model):
 	def get_absolute_url(self):
 		return reverse('show_campaign', args=[self.id])
 
+class Hall(models.Model):
+	DEFAULT_PK = 1
+	campaign = models.ForeignKey(Campaign, default = Campaign.DEFAULT_PK)
+	name = models.CharField(max_length=10, default='')
+	capacity = models.IntegerField(default=0)
+
 class Student(models.Model):
 	campaign = models.ForeignKey(Campaign, default = Campaign.DEFAULT_PK)
+	hall = models.ForeignKey(Hall, default = Hall.DEFAULT_PK, blank = True)
 	egn = models.CharField(max_length=10, default='') 
 	entry_number = models.IntegerField(default=0)
 	first_name = models.CharField(max_length=30, default='')
