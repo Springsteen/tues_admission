@@ -40,12 +40,14 @@ class HomePageTest(Base):
 class HallPopulationTest(Base):
 
 	def test_does_populate_halls_resolves_the_right_url(self):
+		self.client.login(username='john', password='johnpassword')
 		campaign = Campaign.objects.create(title = 'a', description = 'b')
 		hall = Hall.objects.create(name='abv', capacity=50, campaign = campaign)
 		called = self.client.get('/campaigns/%d/halls' % campaign.id)
 		self.assertTemplateUsed(called, 'populate_halls.html')
 
 	def test_does_populate_halls_renders_show_campaign_if_there_isnt_enough_capacity(self):
+		self.client.login(username='john', password='johnpassword')
 		campaign = Campaign.objects.create(title = 'a', description = 'b')
 		self.assertEqual(campaign.hall_set.count(), 0)
 		response = self.client.get('/campaigns/%d/halls' % campaign.id)
@@ -62,6 +64,7 @@ def make_POST_request_for_hall(user):
 class HallsViewsTest(Base):
 
 	def test_does_create_hall_resolves_the_right_url(self):
+		self.client.login(username='john', password='johnpassword')
 		campaign = Campaign.objects.create(title = 'a', description = 'b')
 		called = self.client.get('/campaigns/%d/halls/new' % campaign.id)
 		self.assertTemplateUsed(called, 'create_hall.html')	

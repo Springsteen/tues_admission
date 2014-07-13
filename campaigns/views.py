@@ -159,40 +159,45 @@ def student_as_pdf(request, campaign_id, student_id):
 		return redirect('/')
 
 def create_hall(request, campaign_id):
-	if request.method == 'GET':
-		return render(request, 'create_hall.html', {'campaign_id': campaign_id})
+	if request.user.is_authenticated():	
+		if request.method == 'GET':
+			return render(request, 'create_hall.html', {'campaign_id': campaign_id})
+		else:
+			try:
+				hall = Hall.objects.create(
+					name=request.POST['name'], 
+					capacity=request.POST['capacity']
+				)
+				hall.campaign = Campaign.objects.get(id = campaign_id)
+				hall.save()
+				return redirect('/campaigns/%s/' % campaign_id)
+			except ValidationError:
+				return redirect('/')
 	else:
-		try:
-			hall = Hall.objects.create(
-				name=request.POST['name'], 
-				capacity=request.POST['capacity']
-			)
-			hall.campaign = Campaign.objects.get(id = campaign_id)
-			hall.save()
-			return redirect('/campaigns/%s/' % campaign_id)
-		except ValidationError:
-			return redirect('/')
-
+		return redirect('/')
 
 def populate_halls(request, campaign_id):
-	result = check_for_capacity(
-		Campaign.objects.get(id = campaign_id).hall_set.all(),
-		Campaign.objects.get(id = campaign_id).student_set.count()
-	)
-	if result:
-		populate(
-			Campaign.objects.get(id = campaign_id).hall_set.all(), 
-			Campaign.objects.get(id = campaign_id).student_set.all()
+	if request.user.is_authenticated():
+		result = check_for_capacity(
+			Campaign.objects.get(id = campaign_id).hall_set.all(),
+			Campaign.objects.get(id = campaign_id).student_set.count()
 		)
-		return render(request, 'populate_halls.html', {
-			'students' : Campaign.objects.get(id = campaign_id).student_set.all(),
-			'campaign_id' : campaign_id
-		})
+		if result:
+			populate(
+				Campaign.objects.get(id = campaign_id).hall_set.all(), 
+				Campaign.objects.get(id = campaign_id).student_set.all()
+			)
+			return render(request, 'populate_halls.html', {
+				'students' : Campaign.objects.get(id = campaign_id).student_set.all(),
+				'campaign_id' : campaign_id
+			})
+		else:
+			return render(request, 'show_campaign.html', {
+				'campaign': Campaign.objects.get(id = campaign_id), 
+				'students': Campaign.objects.get(id = campaign_id).student_set.all()
+			})
 	else:
-		return render(request, 'show_campaign.html', {
-			'campaign': Campaign.objects.get(id = campaign_id), 
-			'students': Campaign.objects.get(id = campaign_id).student_set.all()
-		})
+		return redirect('/')
 
 def export_as_csv(request, campaign_id):
 	if request.user.is_authenticated():	
