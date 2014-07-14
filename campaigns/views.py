@@ -8,6 +8,7 @@ from campaigns.models import Campaign, Student, Hall
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from datetime import date
 import csv
 
 EMPTY_CAMPAIGN_FIELDS_ERROR = 'There are validation errors in your submitted form'
@@ -150,7 +151,54 @@ def student_as_pdf(request, campaign_id, student_id):
 
 		p = canvas.Canvas(response)
 		p.setFont('DejaVuSans', 12)
-		p.drawString(0, 820, 'Входящ номер %d' % student.id)
+		p.drawString(30, 820, 'Входящ номер %d' % student.entry_number)
+		p.drawString(425, 820, 'До Ректора на') 
+		p.drawString(425, 805, 'Технически Университет')
+		p.drawString(425, 790, 'гр. София')
+		p.setFont('DejaVuSans', 20)
+		p.drawString(225, 760, 'Заявление')
+		p.setFont('DejaVuSans', 10)
+		p.drawString(30, 745, 'от %s %s %s' % (student.first_name, student.second_name, student.third_name))
+		p.drawString(
+			30, 730, 'ученик/чка от VII клас за учебната %s/%s г. на училище: %s' % 
+			(date.today().year-1, date.today().year, student.previous_school)
+		)
+		p.drawString(30, 715, 'живеещ(настящ адрес): %s' % (student.address))
+		p.drawString(30, 685, 'Г-н Ректор,')
+		p.drawString(30, 670, 'Желая да бъда допуснат/а до състезателен изпит по математика и кандидатстване в')
+		p.drawString(30, 655, 'Технологично училище "Електронни системи" към Технически Университет гр. София')
+		p.drawString(30, 630, 'Прилагам следните документи:')
+		p.drawString(30, 605, '1. Копие на медицинското свидетлество с отразени цветоусещане и диоптри')
+		p.drawString(30, 590, '2. Две снимки от настоящата година')
+		p.drawString(30, 575, '3. Копие от първата страница на ученическия бележник за 7. клас')
+		p.drawString(30, 550, 'Заявявам желания за подредба на специалностите при класирането')
+		p.drawString(30, 525, '1. %s' % student.first_choice)
+		p.drawString(30, 510, '2. %s' % student.second_choice)
+		p.drawString(30, 485, 'Връзка с родител(настойник): %s' % student.parent_name)
+		p.drawString(30, 470, 'тел.')
+		d = date.today()
+		p.drawString(30, 440, 'гр. София, %s/%s/%s' % (d.day, d.month, d.year))
+		p.drawString(390, 465, 'Подпис(на ученика или родителя):')
+		p.drawString(390, 435, '................................')
+		p.line(0,415,600,415)
+		p.setFont('DejaVuSans', 15)
+		p.drawString(120, 395, 'Технологично училище "Електронни системи"') 
+		p.drawString(140, 380 , 'към Технически Университет гр. София')
+		p.setFont('DejaVuSans', 10)
+		p.line(60,350,200,350)
+		p.line(60,150,200,150)
+		p.line(60,350,60,150)
+		p.line(200,350,200,150)
+		p.setFont('DejaVuSans', 15)
+		p.drawString(300, 320 , 'Входящ Nº: %s' % student.entry_number)
+		p.drawString(300, 290 , 'Име: %s' % student.first_name)
+		p.drawString(300, 260 , 'Презиме: %s' % student.second_name)
+		p.drawString(300, 230 , 'Фамилия: %s' % student.third_name)
+		p.setFont('DejaVuSans', 10)
+		p.drawString(60, 120 , 'Настоящият талон служи за вход в залата за изпита')
+		p.drawString(60, 105 , 'Задължително го носете! В противен случай ученикът няма да бъде допуснат до изпита')
+		p.drawString(390, 80, 'Приел документите:')
+		p.drawString(390, 50, '................................')
 
 		p.showPage()
 		p.save()
