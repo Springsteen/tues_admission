@@ -64,6 +64,7 @@ def list_campaigns(request):
 	else:
 		return redirect('/')
 
+
 @transaction.atomic
 def create_student(request, campaign_id):
 	if request.user.is_authenticated():		
@@ -73,6 +74,7 @@ def create_student(request, campaign_id):
 			s = Student.objects.last()
 			s.campaign = Campaign.objects.get(id=campaign_id)
 			s.entry_number = s.campaign.student_set.count()
+			s = validate_grades(s)
 			s.grades_evaluated = (
 				s.bel_school + s.physics_school + s.bel_exam +
 				s.maths_exam + (4 * s.maths_tues_exam) 
@@ -111,19 +113,22 @@ def edit_student(request, campaign_id, student_id):
 			student.address = request.POST['address']
 			student.previous_school = request.POST['previous_school']
 			student.parent_name = request.POST['parent_name']
-			student.bel_school = request.POST['bel_school']
-			student.physics_school = request.POST['physics_school']
-			student.bel_exam = request.POST['bel_exam']
-			student.maths_exam = request.POST['maths_exam']
-			student.maths_tues_exam = request.POST['maths_tues_exam']
+			student.parent_number = request.POST['parent_number']
+			student.bel_school = float(request.POST['bel_school'])
+			student.physics_school = float(request.POST['physics_school'])
+			student.bel_exam = float(request.POST['bel_exam'])
+			student.maths_exam = float(request.POST['maths_exam'])
+			student.maths_tues_exam = float(request.POST['maths_tues_exam'])
 			student.first_choice = request.POST['first_choice']
 			student.second_choice = request.POST['second_choice']
+
+			student = validate_grades(student)
+
 			student.grades_evaluated = (
 				student.bel_school + student.physics_school + student.bel_exam +
 				student.maths_exam + (4 * student.maths_tues_exam) 
 			)
-			try:	
-				student.full_clean()
+			try:
 				student.save()
 				return redirect(Campaign.objects.get(id = student.campaign.id))
 			except ValidationError:
@@ -175,7 +180,7 @@ def student_as_pdf(request, campaign_id, student_id):
 		p.drawString(30, 525, '1. %s' % student.first_choice)
 		p.drawString(30, 510, '2. %s' % student.second_choice)
 		p.drawString(30, 485, 'Връзка с родител(настойник): %s' % student.parent_name)
-		p.drawString(30, 470, 'тел.')
+		p.drawString(30, 470, 'тел. %s' % student.parent_number)
 		d = date.today()
 		p.drawString(30, 440, 'гр. София, %s/%s/%s' % (d.day, d.month, d.year))
 		p.drawString(390, 465, 'Подпис(на ученика или родителя):')
@@ -302,5 +307,17 @@ def populate(hall_set, students):
 		s.hall = hall_set[hallIndex]
 		s.save()
 
+def validate_grades(s):
+	if s.bel_school == None:
+		s.bel_school = 0
+	if s.bel_exam == None:
+		s.bel_exam = 0
+	if s.maths_exam == None:
+		s.maths_exam = 0
+	if s.maths_tues_exam == None:
+		s.maths_tues_exam = 0
+	if s.physics_school == None:
+		s.physics_school = 0
+	return s		
 
 

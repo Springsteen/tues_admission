@@ -24,7 +24,7 @@ class StudentForm(forms.models.ModelForm):
             'egn', 'address', 'parent_name',
             'previous_school', 'bel_school', 'physics_school',
             'bel_exam', 'maths_exam', 'maths_tues_exam',
-            'first_choice', 'second_choice',
+            'first_choice', 'second_choice', 'parent_number'
         )
         widgets = {
             'first_name': forms.fields.TextInput(attrs={
@@ -43,6 +43,9 @@ class StudentForm(forms.models.ModelForm):
                 'class': '',
             }),
             'parent_name': forms.fields.TextInput(attrs={
+                'class': '',
+            }),
+            'parent_number': forms.fields.TextInput(attrs={
                 'class': '',
             }),
             'previous_school': forms.fields.TextInput(attrs={

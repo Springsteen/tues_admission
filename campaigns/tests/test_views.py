@@ -173,6 +173,7 @@ def make_POST_request_for_student(user):
 	request.POST['third_name'] = 'Asenski'
 	request.POST['address'] = 'address'
 	request.POST['parent_name'] = 'Asen Asenov'
+	request.POST['parent_number'] = '0123456789'
 	request.POST['previous_school'] = 'SOU "ASDF"'
 	request.POST['bel_school'] = 3
 	request.POST['physics_school'] = 4
