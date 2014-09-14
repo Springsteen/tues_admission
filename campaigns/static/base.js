@@ -9,7 +9,7 @@ $(document).ready(function(){
 			
 				$("<div " 
 					+ "id=\"id_egn_warning\"" 
-					+ "class=\"alert alert-warning\">"
+					+ "class=\"alert alert-warning form_warning\">"
 					+ "</div>").insertAfter(this);
 			
 		}
@@ -19,6 +19,27 @@ $(document).ready(function(){
 		}else{
 			$("#id_egn_warning").removeClass("alert alert-warning").addClass("alert alert-success");
 			$("#id_egn_warning").text("ЕГН-то е коректно");
+		}
+	});
+
+	$(document).on("keyup", ".student_grade_input", function(){
+		var gradeWritten = parseInt($(this).val());
+		var elemId = $(this).attr("id");
+		var warningExists = document.getElementById(elemId+"_warning");
+		if (warningExists == null) {
+			
+				$("<div " 
+					+ "id=\""+ elemId +"_warning\"" 
+					+ "class=\"alert alert-warning form_warning\">"
+					+ "</div>").insertAfter(this);
+			
+		}
+		if ((gradeWritten < 2) || (gradeWritten > 6)) {
+			$("#" + elemId + "_warning").removeClass("alert alert-success").addClass("alert alert-warning");
+			$("#" + elemId + "_warning").text("Въведената оценка не е коректна");
+		}else{
+			$("#" + elemId + "_warning").removeClass("alert alert-warning").addClass("alert alert-success");
+			$("#" + elemId + "_warning").text("Оценката е коректна");
 		}
 	});
 

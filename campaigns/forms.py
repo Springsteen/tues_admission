@@ -52,19 +52,19 @@ class StudentForm(forms.models.ModelForm):
                 'class': 'student_field',
             }),
             'bel_school': forms.fields.NumberInput(attrs={
-                'class': 'student_field',
+                'class': 'student_field student_grade_input',
             }),
             'physics_school': forms.fields.NumberInput(attrs={
-                'class': 'student_field',
+                'class': 'student_field student_grade_input',
             }),
             'bel_exam': forms.fields.NumberInput(attrs={
-                'class': 'student_field',
+                'class': 'student_field student_grade_input',
             }),
             'maths_exam': forms.fields.NumberInput(attrs={
-                'class': 'student_field',
+                'class': 'student_field student_grade_input',
             }),
             'maths_tues_exam': forms.fields.NumberInput(attrs={
-                'class': 'student_field',
+                'class': 'student_field student_grade_input',
             }),
             'first_choice': forms.fields.TextInput(attrs={
                 'class': 'student_field',

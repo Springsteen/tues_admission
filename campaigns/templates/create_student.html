@@ -10,35 +10,35 @@
 		<form method="POST" action="/campaigns/{{campaign_id}}/students/new" role="form">
 			{% csrf_token %}
 			
-			Първо име: <br>{{ form.first_name }}<br><br>
+			<div class="panel panel-danger">Първо име: <br>{{ form.first_name }}<br><br></div>
 			
-			Презиме: <br>{{ form.second_name }}<br><br>
+			<div class="panel panel-danger">Презиме: <br>{{ form.second_name }}<br><br></div>
 			
-			Фамилия: <br>{{ form.third_name }}<br><br>
+			<div class="panel panel-danger">Фамилия: <br>{{ form.third_name }}<br><br></div>
 			
-			ЕГН: <br>{{ form.egn }}<br><br>
+			<div class="panel panel-danger">ЕГН: <br>{{ form.egn }}<br><br></div>
 
-			Адрес: <br>{{form.address}}<br><br>
+			<div class="panel panel-danger">Адрес: <br>{{form.address}}<br><br></div>
 
-			Имена на родител: <br>{{form.parent_name}}<br><br>
+			<div class="panel panel-danger">Имена на родител: <br>{{form.parent_name}}<br><br></div>
 
-			Телефон на родител: <br>{{form.parent_number}}<br><br>
+			<div class="panel panel-danger">Телефон на родител: <br>{{form.parent_number}}<br><br></div>
 
-			Училище: <br>{{form.previous_school}}<br><br>
+			<div class="panel panel-danger">Училище: <br>{{form.previous_school}}<br><br></div>
 
-			БЕЛ-Училище: <br>{{form.bel_school}}<br><br>
+			<div class="panel panel-danger">БЕЛ-Училище: <br>{{form.bel_school}}<br><br></div>
 
-			Физика-Училище: <br>{{form.physics_school}}<br><br>
+			<div class="panel panel-danger">Физика-Училище: <br>{{form.physics_school}}<br><br></div>
 
-			БЕЛ-Матура: <br>{{form.bel_exam}}<br><br>
+			<div class="panel panel-danger">БЕЛ-Матура: <br>{{form.bel_exam}}<br><br></div>
 
-			Математика-Матура: <br>{{form.maths_exam}}<br><br>
+			<div class="panel panel-danger">Математика-Матура: <br>{{form.maths_exam}}<br><br></div>
 
-			Математика-ТУЕС: <br>{{form.maths_tues_exam}}<br><br>
+			<div class="panel panel-danger">Математика-ТУЕС: <br>{{form.maths_tues_exam}}<br><br></div>
 
-			Първо желание: <br>{{form.first_choice}}<br><br>
+			<div class="panel panel-danger">Първо желание: <br>{{form.first_choice}}<br><br></div>
 
-			Второ желание: <br>{{form.second_choice}}<br><br>
+			<div class="panel panel-danger">Второ желание: <br>{{form.second_choice}}<br><br></div>
 			
 			<input type="submit" value="Запази" class="btn btn-primary"/>
 			
