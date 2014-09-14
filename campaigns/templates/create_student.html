@@ -10,13 +10,13 @@
 		<form method="POST" action="/campaigns/{{campaign_id}}/students/new" role="form">
 			{% csrf_token %}
 			
-			<div class="panel panel-danger">Първо име: <br>{{ form.first_name }}<br><br></div>
+			<div class="panel panel-danger">Първо име(*): <br>{{ form.first_name }}<br><br></div>
 			
-			<div class="panel panel-danger">Презиме: <br>{{ form.second_name }}<br><br></div>
+			<div class="panel panel-danger">Презиме(*): <br>{{ form.second_name }}<br><br></div>
 			
-			<div class="panel panel-danger">Фамилия: <br>{{ form.third_name }}<br><br></div>
+			<div class="panel panel-danger">Фамилия(*): <br>{{ form.third_name }}<br><br></div>
 			
-			<div class="panel panel-danger">ЕГН: <br>{{ form.egn }}<br><br></div>
+			<div class="panel panel-danger">ЕГН(*): <br>{{ form.egn }}<br><br></div>
 
 			<div class="panel panel-danger">Адрес: <br>{{form.address}}<br><br></div>
 

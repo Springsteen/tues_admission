@@ -23,7 +23,7 @@ $(document).ready(function(){
 	});
 
 	$(document).on("keyup", ".student_grade_input", function(){
-		var gradeWritten = parseInt($(this).val());
+		var gradeWritten = parseInt($(this).val()) || false;
 		var elemId = $(this).attr("id");
 		var warningExists = document.getElementById(elemId+"_warning");
 		if (warningExists == null) {
@@ -34,7 +34,7 @@ $(document).ready(function(){
 					+ "</div>").insertAfter(this);
 			
 		}
-		if ((gradeWritten < 2) || (gradeWritten > 6)) {
+		if ((gradeWritten == false) || (gradeWritten < 2) || (gradeWritten > 6)) {
 			$("#" + elemId + "_warning").removeClass("alert alert-success").addClass("alert alert-warning");
 			$("#" + elemId + "_warning").text("Въведената оценка не е коректна");
 		}else{
