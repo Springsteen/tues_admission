@@ -28,48 +28,48 @@ class StudentForm(forms.models.ModelForm):
         )
         widgets = {
             'first_name': forms.fields.TextInput(attrs={
-                'class': '',
+                'class': 'student_field',
             }),
             'second_name': forms.fields.TextInput(attrs={
-                'class': '',
+                'class': 'student_field',
             }),
             'third_name': forms.fields.TextInput(attrs={
-                'class': '',
+                'class': 'student_field',
             }),
             'egn': forms.fields.TextInput(attrs={
-                'class': '',
+                'class': 'student_field',
             }),
             'address': forms.fields.TextInput(attrs={
-                'class': '',
+                'class': 'student_field',
             }),
             'parent_name': forms.fields.TextInput(attrs={
-                'class': '',
+                'class': 'student_field',
             }),
             'parent_number': forms.fields.TextInput(attrs={
-                'class': '',
+                'class': 'student_field',
             }),
             'previous_school': forms.fields.TextInput(attrs={
-                'class': '',
+                'class': 'student_field',
             }),
             'bel_school': forms.fields.NumberInput(attrs={
-                'class': '',
+                'class': 'student_field',
             }),
             'physics_school': forms.fields.NumberInput(attrs={
-                'class': '',
+                'class': 'student_field',
             }),
             'bel_exam': forms.fields.NumberInput(attrs={
-                'class': '',
+                'class': 'student_field',
             }),
             'maths_exam': forms.fields.NumberInput(attrs={
-                'class': '',
+                'class': 'student_field',
             }),
             'maths_tues_exam': forms.fields.NumberInput(attrs={
-                'class': '',
+                'class': 'student_field',
             }),
             'first_choice': forms.fields.TextInput(attrs={
-                'class': '',
+                'class': 'student_field',
             }),
             'second_choice': forms.fields.TextInput(attrs={
-                'class': '',
+                'class': 'student_field',
             }),
         }

@@ -11,8 +11,6 @@ from reportlab.pdfbase.ttfonts import TTFont
 from datetime import date
 import csv
 
-EMPTY_CAMPAIGN_FIELDS_ERROR = 'There are validation errors in your submitted form'
-
 def home(request):
 	if request.method == 'GET':
 		return render(request, 'home.html')
@@ -23,7 +21,7 @@ def home(request):
 		if user is not None:
 			if user.is_active:
 				login(request, user)
-				return redirect('/')
+				return redirect('/campaigns')
 			else:
 				return redirect('/')
 		else:

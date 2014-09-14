@@ -9,7 +9,6 @@ from campaigns.views import (
 	list_campaigns, create_student,
 	show_student, edit_student,
 	create_hall,
-	EMPTY_CAMPAIGN_FIELDS_ERROR,
 )
 
 class Base(TestCase):
