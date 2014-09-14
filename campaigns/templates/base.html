@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <head>
     <title>{% block title %}{% endblock %}</title>
-    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="/static/base.css" rel="stylesheet" media="screen">
-    <script type="text/javascript" src="/static/jquery.js"></script>
+    <link href="{{ STATIC_URL }}css/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="{{ STATIC_URL }}css/base.css" rel="stylesheet" media="screen">
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script>
 </head>
 
 <body>
@@ -43,5 +43,5 @@
         {% block populate_halls %}{% endblock %}
   	</div>
 
-    <script type="text/javascript" src="/static/base.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/form_validations.js"></script>
 </body>
