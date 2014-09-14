@@ -7,8 +7,12 @@
 {% block populate_halls_link %}<li class="active"><a href="/campaigns/{{ campaign.id }}/halls">Разпредели по зали</a></li>{% endblock %}
 
 {% block show_campaign %}
+	
+	<div class="panel panel-success">
+		Ученици: <input type="checkbox" id="show_campaign">
+	</div>
 
-	<table class="table table-hover table-bordered">	
+	<table id="show_campaign_table" class="table table-hover table-bordered">	
 		<thead>
 			<tr>
 				<td><b>№</b></td>
