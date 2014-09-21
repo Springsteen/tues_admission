@@ -10,40 +10,58 @@
 	
 	<div class="panel panel-success">
 		Ученици: <input type="checkbox" id="show_campaign">
+		Зали: <input type="checkbox" id="show_campaign_halls">
 	</div>
+
+	<table id="show_campaign_halls_table" class="table table-hover table-bordered">
+		<thead>
+			<tr>
+				<td><center><b>Име на залата</b></center></td>
+				<td><center><b>Капацитет на залата</b></center></td>
+			</tr>
+		</thead>
+		<tbody>
+			{% for h in halls %}
+				<tr>
+					<td><center>{{ h.name }}</center></td>
+					<td><center>{{ h.capacity }}</center></td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 
 	<table id="show_campaign_table" class="table table-hover table-bordered">	
 		<thead>
 			<tr>
-				<td><b>№</b></td>
-				<td><b>Първо име</b></td>
-				<td><b>Презиме</b></td>
-				<td><b>Фамилия</b></td>
-				<td><b>БЕЛ-Училище</b></td>
-				<td><b>Физика-Училище</b></td>
-				<td><b>БЕЛ-Матура</b></td>
-				<td><b>Математика-Матура</b></td>
-				<td><b>Математика-ТУЕС</b></td>
-				<td></td>
-				<td></td>
-				<td></td>
+				<td><center><b>№</b></center></td>
+				<td><center><b>Първо име</b></center></td>
+				<td><center><b>Презиме</b></center></td>
+				<td><center><b>Фамилия</b></center></td>
+				<td><center><b>БЕЛ-Училище</b></center></td>
+				<td><center><b>Физика-Училище</b></center></td>
+				<td><center><b>БЕЛ-Матура</b></center></td>
+				<td><center><b>Математика-Матура</b></center></td>
+				<td><center><b>Математика-ТУЕС</b></center></td>
+				<td><center></center></td>
+				<td><center></center></td>
+				<td><center></center></td>
 			</tr>
 		</thead>
 		<tbody>
 			{% for s in students %}
 				<tr>				
-					<td>{{ s.entry_number }}</td>
-					<td>{{ s.first_name }}</td>
-					<td>{{ s.second_name }}</td>
-					<td>{{ s.third_name }}</td>
-					<td>{{ s.bel_school }}</td>
-					<td>{{ s.physics_school }}</td>
-					<td>{{ s.bel_exam }}</td>
-					<td>{{ s.maths_exam }}</td>
-					<td>{{ s.maths_tues_exam }}</td>
-					<td><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/">Още данни</a></td>
-					<td><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/edit">Промени</a></td>
-					<td><a href="/campaigns/{{ campaign.id }}/students/{{ s.id }}.pdf/">Генерирай формуляр</a></td>
+					<td><center>{{ s.entry_number }}</center></td>
+					<td><center>{{ s.first_name }}</center></td>
+					<td><center>{{ s.second_name }}</center></td>
+					<td><center>{{ s.third_name }}</center></td>
+					<td><center>{{ s.bel_school }}</center></td>
+					<td><center>{{ s.physics_school }}</center></td>
+					<td><center>{{ s.bel_exam }}</center></td>
+					<td><center>{{ s.maths_exam }}</center></td>
+					<td><center>{{ s.maths_tues_exam }}</center></td>
+					<td><center><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/">Още данни</a></center></td>
+					<td><center><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/edit">Промени</a></center></td>
+					<td><center><a href="/campaigns/{{ campaign.id }}/students/{{ s.id }}.pdf/">Генерирай формуляр</a></center></td>
 				</tr>
 			{% endfor %}
 		</tbody>

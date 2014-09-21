@@ -49,7 +49,17 @@ def show_campaign(request, campaign_id):
 		try:
 			campaign = Campaign.objects.get(id = campaign_id)
 			students = campaign.student_set.all()
-			return render(request, 'show_campaign.html', {'campaign': campaign, 'students': students})
+			halls = campaign.hall_set.all()
+			print (halls)
+			return render(
+				request, 
+				'show_campaign.html', 
+				{
+					'campaign': campaign, 
+					'students': students,
+					'halls': halls
+				}
+			)
 		except ObjectDoesNotExist:
 			return redirect('/')
 	else:
