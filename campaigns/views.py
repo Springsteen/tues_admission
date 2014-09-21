@@ -50,7 +50,6 @@ def show_campaign(request, campaign_id):
 			campaign = Campaign.objects.get(id = campaign_id)
 			students = campaign.student_set.all()
 			halls = campaign.hall_set.all()
-			print (halls)
 			return render(
 				request, 
 				'show_campaign.html', 
