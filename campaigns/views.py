@@ -3,12 +3,18 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpResponse
 from django.db import transaction
+
 from campaigns.forms import CampaignForm, StudentForm
 from campaigns.models import Campaign, Student, Hall
+
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+
 from datetime import date
+
+import json
+
 import csv
 
 def home(request):
@@ -64,13 +70,43 @@ def show_campaign(request, campaign_id):
 	else:
 		return redirect('/')
 
+def search_campaign(request, campaign_id):
+	# print (request.GET['first_name'], request.GET['egn'])
+	campaign = Campaign.objects.get(id = campaign_id)
+
+	result_set = campaign.student_set.all().filter(
+		first_name = request.GET['first_name']
+	)
+
+	if result_set.count() == 0:
+		# print("Im searching by EGN")
+		result_set = campaign.student_set.all().filter(
+			egn = request.GET['egn']
+		)
+
+	response = {}
+	
+	if result_set.count() > 0:
+		response['status'] = '200'
+		response['result_set'] = {}
+		result_hash = response['result_set']
+		for student in result_set:
+			result_hash[student.id] = {} 
+			result_hash[student.id]['id'] = student.id
+			result_hash[student.id]['first_name'] = student.first_name
+			result_hash[student.id]['second_name'] = student.second_name
+			result_hash[student.id]['third_name'] = student.third_name
+	else:
+		response['status'] = '404'
+	
+	return HttpResponse(json.dumps(response), content_type="application/json")
+
 def list_campaigns(request):
 	if request.user.is_authenticated():
 		campaigns = Campaign.objects.all()
 		return render(request, 'list_campaigns.html', {'campaigns': campaigns})
 	else:
 		return redirect('/')
-
 
 @transaction.atomic
 def create_student(request, campaign_id):

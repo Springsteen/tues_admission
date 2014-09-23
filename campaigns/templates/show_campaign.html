@@ -8,6 +8,25 @@
 
 {% block show_campaign %}
 	
+	<div class="panel panel-success" id="campaign_search">
+		<div class="form-inline form-group">
+			<input 
+				type="text" 
+				id="search_first_name" 
+				class="form-control campaign_search"
+				placeholder="Собствено име"
+			>
+			<input 
+				type="text" 
+				id="search_egn" 
+				class="form-control campaign_search"
+				placeholder="ЕГН"
+			>
+			<button id='search_campaign_button' class="btn btn-success">Търси</button>
+			<button id='clear_search_campaign_button' class="btn btn-warning">Изчисти</button>
+		</div>
+	</div>
+
 	<div class="panel panel-success">
 		Ученици: <input type="checkbox" id="show_campaign">
 		Зали: <input type="checkbox" id="show_campaign_halls">
@@ -34,7 +53,7 @@
 		<thead>
 			<tr>
 				<td><center><b>№</b></center></td>
-				<td><center><b>Първо име</b></center></td>
+				<td><center><b>Собствено име</b></center></td>
 				<td><center><b>Презиме</b></center></td>
 				<td><center><b>Фамилия</b></center></td>
 				<td><center><b>БЕЛ-Училище</b></center></td>
