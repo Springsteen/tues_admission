@@ -89,4 +89,8 @@ $(document).ready(function(){
 		}
 	});
 
+	$(document).on("click", ".transaction_btn", function() {
+		$(this).disabled = true;
+	});
+
 });

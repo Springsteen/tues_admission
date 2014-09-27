@@ -22,6 +22,7 @@ $(document).ready(function (){
 	});
 
 	$(document).on("click", "#search_campaign_button", function(){
+		document.getElementById("search_campaign_button").disabled = true;
 		var searchUrl = document.URL;
 		searchUrl += "search";
 
@@ -35,13 +36,18 @@ $(document).ready(function (){
 			searchUrl,
 			{"first_name" : $firstName.val(), "egn" : $egn.val()},
 			function(response){
-				// console.log(response);
-				$searchPanel.append("<div id=\"search_result\">");
+				var searchExists = document.getElementById("search_result");
+				if (searchExists == null){
+					$searchPanel.append("<div id=\"search_result\">");
+				}else{
+					$("#search_result").remove();
+					$searchPanel.append("<div id=\"search_result\">");
+				}
 				var $searchResultBox = $("#search_result");
-			
+
 				if (response.hasOwnProperty('result_set')){
 					
-					var html = "<table class=\"table table-hover table-bordered\">";
+					var html = "<table class=\"table table-hover table-stripped\">";
 
 					html += "<thead><tr>";
 					html += "<td><b>Собствено име</b></td>";
@@ -66,7 +72,10 @@ $(document).ready(function (){
 					$searchResultBox.append(html);
 
 				}else{
-					$searchResultBox.append("<p class=\"alert alert-danger\">Не бяха намерени съвпадения.</p>");
+					var warningExists = document.getElementById("search_warning");
+					if (warningExists == null){
+						$searchResultBox.append("<p id=\"search_warning\" class=\"alert alert-danger\">Не бяха намерени съвпадения.</p>");
+					}
 				}
 			}
 		);
@@ -77,6 +86,7 @@ $(document).ready(function (){
 
 	$(document).on("click", "#clear_search_campaign_button", function(){
 		$("#search_result").remove();
+		document.getElementById("search_campaign_button").disabled = false;
 	});
 
 });

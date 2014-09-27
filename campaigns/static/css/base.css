@@ -1,12 +1,3 @@
-.panel {
-	padding: 20px;
-	margin: 20px;
-}
-
-/*.table {
-	margin: 20px;
-}
-*/
 .login_form {
 	padding-left:  40%;
 	padding-right: 40%;
@@ -16,3 +7,32 @@
 	float: right;
 }
 
+.navbar {
+	margin: 0 20px 20px	20px;
+	overflow: hidden;
+}
+
+ul.nav > li {
+	border-right: 1px solid black;
+}
+
+ul.nav:first-child {
+	border-left: 1px solid black;
+}
+
+#elsys_brand {
+	border-right: 1px solid black;
+}
+
+#logout_button {
+	margin-right: 10px;
+	border-left: 1px solid black;
+}
+
+#campaign_nav {
+	padding: 1em;
+}
+
+#campaign_search {}
+
+#campaign_checks {}

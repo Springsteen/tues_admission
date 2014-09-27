@@ -8,28 +8,30 @@
 
 {% block show_campaign %}
 	
-	<div class="panel panel-success" id="campaign_search">
-		<div class="form-inline form-group">
-			<input 
-				type="text" 
-				id="search_first_name" 
-				class="form-control campaign_search"
-				placeholder="Собствено име"
-			>
-			<input 
-				type="text" 
-				id="search_egn" 
-				class="form-control campaign_search"
-				placeholder="ЕГН"
-			>
-			<button id='search_campaign_button' class="btn btn-success">Търси</button>
-			<button id='clear_search_campaign_button' class="btn btn-warning">Изчисти</button>
+	<div class="row panel panel-success" id="campaign_nav">
+		<div class="col-md-8" id="campaign_search">
+			<div class="form-inline form-group">
+				<input 
+					type="text" 
+					id="search_first_name" 
+					class="form-control campaign_search"
+					placeholder="Собствено име"
+				>
+				<input 
+					type="text" 
+					id="search_egn" 
+					class="form-control campaign_search"
+					placeholder="ЕГН"
+				>
+				<button id='search_campaign_button' class="btn btn-success">Търси</button>
+				<button id='clear_search_campaign_button' class="btn btn-warning">Изчисти</button>
+			</div>
 		</div>
-	</div>
 
-	<div class="panel panel-success">
-		Ученици: <input type="checkbox" id="show_campaign">
-		Зали: <input type="checkbox" id="show_campaign_halls">
+		<div class="col-md-4" id="campaign_checks">
+			Ученици: <input type="checkbox" id="show_campaign">
+			Зали: <input type="checkbox" id="show_campaign_halls">
+		</div>
 	</div>
 
 	<table id="show_campaign_halls_table" class="table table-hover table-bordered">
@@ -37,6 +39,8 @@
 			<tr>
 				<td><center><b>Име на залата</b></center></td>
 				<td><center><b>Капацитет на залата</b></center></td>
+				<td></td>
+				<td></td>
 			</tr>
 		</thead>
 		<tbody>
@@ -44,6 +48,8 @@
 				<tr>
 					<td><center>{{ h.name }}</center></td>
 					<td><center>{{ h.capacity }}</center></td>
+					<td><center>Промени</center></td>
+					<td><center>Изтрий</center></td>
 				</tr>
 			{% endfor %}
 		</tbody>
@@ -56,11 +62,8 @@
 				<td><center><b>Собствено име</b></center></td>
 				<td><center><b>Презиме</b></center></td>
 				<td><center><b>Фамилия</b></center></td>
-				<td><center><b>БЕЛ-Училище</b></center></td>
-				<td><center><b>Физика-Училище</b></center></td>
-				<td><center><b>БЕЛ-Матура</b></center></td>
-				<td><center><b>Математика-Матура</b></center></td>
-				<td><center><b>Математика-ТУЕС</b></center></td>
+				<td><center><b>ЕГН</b></center></td>
+				<td><center><b>БАЛ</b></center></td>
 				<td><center></center></td>
 				<td><center></center></td>
 				<td><center></center></td>
@@ -73,11 +76,8 @@
 					<td><center>{{ s.first_name }}</center></td>
 					<td><center>{{ s.second_name }}</center></td>
 					<td><center>{{ s.third_name }}</center></td>
-					<td><center>{{ s.bel_school }}</center></td>
-					<td><center>{{ s.physics_school }}</center></td>
-					<td><center>{{ s.bel_exam }}</center></td>
-					<td><center>{{ s.maths_exam }}</center></td>
-					<td><center>{{ s.maths_tues_exam }}</center></td>
+					<td><center>{{ s.egn }}</center></td>
+					<td><center>{{ s.grades_evaluated }}</center></td>
 					<td><center><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/">Още данни</a></center></td>
 					<td><center><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/edit">Промени</a></center></td>
 					<td><center><a href="/campaigns/{{ campaign.id }}/students/{{ s.id }}.pdf/">Генерирай формуляр</a></center></td>

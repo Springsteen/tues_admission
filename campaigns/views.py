@@ -71,7 +71,6 @@ def show_campaign(request, campaign_id):
 		return redirect('/')
 
 def search_campaign(request, campaign_id):
-	# print (request.GET['first_name'], request.GET['egn'])
 	campaign = Campaign.objects.get(id = campaign_id)
 
 	result_set = campaign.student_set.all().filter(
@@ -79,7 +78,6 @@ def search_campaign(request, campaign_id):
 	)
 
 	if result_set.count() == 0:
-		# print("Im searching by EGN")
 		result_set = campaign.student_set.all().filter(
 			egn = request.GET['egn']
 		)
@@ -127,7 +125,6 @@ def create_student(request, campaign_id):
 			students = Campaign.objects.get(id=campaign_id).student_set.all()
 			return redirect(Campaign.objects.get(id=campaign_id))
 		else:
-			# ADD ERRORS BY CHECKING WHETER THE REQUEST IS POST OR GET
 			return render(request, 'create_student.html', {'form': form, 'campaign_id': campaign_id})
 	else:
 		return redirect('/')
@@ -144,11 +141,8 @@ def edit_student(request, campaign_id, student_id):
 					{'student': student, 'campaign': campaign}
 				)
 			except ObjectDoesNotExist:
-				# add errors
 				return redirect('/')
 		else:
-			# very ugly but i know it works
-			# TODO - MAKE IT WITH FORM
 			student = Student.objects.get(id = student_id)
 			student.first_name = request.POST['first_name']
 			student.second_name = request.POST['second_name']
@@ -176,7 +170,6 @@ def edit_student(request, campaign_id, student_id):
 				student.save()
 				return redirect(Campaign.objects.get(id = student.campaign.id))
 			except ValidationError:
-				# add errors and redirect to back to the form insteed of home
 				return redirect('/')
 	else:
 		return redirect('/')

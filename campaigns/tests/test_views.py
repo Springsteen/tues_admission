@@ -335,7 +335,11 @@ class StudentViewTest(Base):
 		saved_student = Student.objects.get(id = saved_student.id)
 		self.assertEqual(saved_student.grades_evaluated, 38.0)
 
-
-
-
-
+	# def test_does_delete_student_deletes_the_right_student(self):
+	# 	self.client.login(username='john', password='johnpassword')
+	# 	create_student(
+	# 		make_POST_request_for_student(self.user),
+	# 		campaign.id
+	# 	)
+	# 	self.assertEqual(Student.objects.count(), 1)
+	# 	Student.objects.first()
