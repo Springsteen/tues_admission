@@ -88,14 +88,15 @@ def search_campaign(request, campaign_id):
 	
 	if result_set.count() > 0:
 		response['status'] = '200'
+		response['campaign_id'] = campaign_id
 		response['result_set'] = {}
 		result_hash = response['result_set']
 		for student in result_set:
 			result_hash[student.id] = {} 
 			result_hash[student.id]['id'] = student.id
 			result_hash[student.id]['first_name'] = student.first_name
-			result_hash[student.id]['second_name'] = student.second_name
 			result_hash[student.id]['third_name'] = student.third_name
+			result_hash[student.id]['egn'] = student.egn
 	else:
 		response['status'] = '404'
 	

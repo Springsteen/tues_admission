@@ -40,15 +40,33 @@ $(document).ready(function (){
 				var $searchResultBox = $("#search_result");
 			
 				if (response.hasOwnProperty('result_set')){
-							
+					
+					var html = "<table class=\"table table-hover table-bordered\">";
+
+					html += "<thead><tr>";
+					html += "<td><b>Собствено име</b></td>";
+					html += "<td><b>Фамилия</b></td>";
+					html += "<td><b>ЕГН</b></td>";
+					html += "<td></td>";
+					html += "<td></td>";
+					html += "</tr></thead>";
+
+					html += "<tbody>";
 					for (id in response['result_set']){
-						// console.log(response['result_set'][id]['first_name']);
-						$searchResultBox.append(response['result_set'][id]['first_name']);
-						// TODO - make table with results
+						html += "<tr>"
+						html += ("<td>" + response['result_set'][id]['first_name'] + "</td>");	
+						html += ("<td>" + response['result_set'][id]['third_name'] + "</td>");	
+						html += ("<td>" + response['result_set'][id]['egn'] + "</td>");	
+						html += ("<td><a href=\"/campaigns/" + response['campaign_id'] + "/students/" + response['result_set'][id]['id'] + "/\" >Още данни</a></td>");	
+						html += ("<td><a href=\"/campaigns/" + response['campaign_id'] + "/students/" + response['result_set'][id]['id'] + "/edit\" >Промени</a></td>");	
+						html += "</tr>";
 					}
-				
+
+					html += "</tbody></table>";
+					$searchResultBox.append(html);
+
 				}else{
-					$searchResultBox.append("nqma rezultat");
+					$searchResultBox.append("<p class=\"alert alert-danger\">Не бяха намерени съвпадения.</p>");
 				}
 			}
 		);
