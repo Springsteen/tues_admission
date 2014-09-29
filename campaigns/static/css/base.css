@@ -1,11 +1,12 @@
+/* BASE */
+
 .login_form {
 	padding-left:  40%;
 	padding-right: 40%;
 }
 
-.form_warning {
-	float: right;
-}
+
+/* NAVIGATION PANEL */
 
 .navbar {
 	margin: 0 20px 20px	20px;
@@ -29,6 +30,9 @@ ul.nav:first-child {
 	border-left: 1px solid black;
 }
 
+
+/* CAMPAIGN VIEW */
+
 #campaign_nav {
 	padding: 1em;
 }
@@ -36,3 +40,32 @@ ul.nav:first-child {
 #campaign_search {}
 
 #campaign_checks {}
+
+
+/* CREATE STUDENT FORM */
+
+.student_field {
+	margin: 0.5em;
+	width: 40%;
+	margin-right: 200px;
+}
+
+#create_student_form {
+	padding: 1em;
+}
+
+#create_student_form > form > div.panel {
+	padding: 0.5em;
+	height: 100px;
+	overflow: hidden;
+}
+
+#create_student_form > form > div.panel > * {
+	display: inline-table;
+}
+
+.form_warning {
+	float: right;
+	width: 400px;
+	margin-bottom: 0px;
+}

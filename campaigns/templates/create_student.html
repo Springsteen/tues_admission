@@ -6,7 +6,7 @@
 
 {% block create_student %}
 
-	<div class="panel panel-primary">
+	<div class="panel panel-primary" id="create_student_form">
 		<form method="POST" action="/campaigns/{{campaign_id}}/students/new" role="form">
 			{% csrf_token %}
 			
