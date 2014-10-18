@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpResponse
 from django.db import transaction
@@ -27,14 +28,18 @@ def home(request):
 		if user is not None:
 			if user.is_active:
 				login(request, user)
+				messages.success(request, "Вие влязохте успешно!")
 				return redirect('/campaigns')
 			else:
+				messages.warning(request, "Този потребител не е активен!")
 				return redirect('/')
 		else:
+			messages.warning(request, "Такъв потребител не съществува!")
 			return redirect('/')
 
 def logout_user(request):
 	logout(request)
+	messages.success(request, "Вие излязохте успешно!")
 	return redirect('/')
 
 @transaction.atomic
@@ -115,14 +120,13 @@ def create_student(request, campaign_id):
 			form.save()
 			s = Student.objects.last()
 			s.campaign = Campaign.objects.get(id=campaign_id)
-			s.entry_number = s.campaign.student_set.count()
+			s.entry_number = s.campaign.student_set.count() 
 			s = validate_grades(s)
 			s.grades_evaluated = (
 				s.bel_school + s.physics_school + s.bel_exam +
 				s.maths_exam + (4 * s.maths_tues_exam) 
 			)
 			s.save()
-			students = Campaign.objects.get(id=campaign_id).student_set.all()
 			return redirect(Campaign.objects.get(id=campaign_id))
 		else:
 			return render(request, 'create_student.html', {'form': form, 'campaign_id': campaign_id})
@@ -344,17 +348,24 @@ def populate(hall_set, students):
 		s.hall = hall_set[hallIndex]
 		s.save()
 
-def validate_grades(s):
-	if s.bel_school == None:
-		s.bel_school = 0
-	if s.bel_exam == None:
-		s.bel_exam = 0
-	if s.maths_exam == None:
-		s.maths_exam = 0
-	if s.maths_tues_exam == None:
-		s.maths_tues_exam = 0
-	if s.physics_school == None:
-		s.physics_school = 0
-	return s		
+def validate_grades(student):
+
+	def met_constraints(grade):
+		if grade == None or grade < 2 or grade > 6:		
+			return False
+		return True
+	
+	if not met_constraints(student.bel_school):
+		student.bel_school = 0
+	if not met_constraints(student.bel_exam):
+		student.bel_exam = 0
+	if not met_constraints(student.maths_exam):
+		student.maths_exam = 0
+	if not met_constraints(student.maths_tues_exam):
+		student.maths_tues_exam = 0
+	if not met_constraints(student.physics_school):
+		student.physics_school = 0
+
+	return student		
 
 
