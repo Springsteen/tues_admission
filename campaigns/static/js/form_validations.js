@@ -1,23 +1,28 @@
 $(document).ready(function(){
+	
+	$(document).on("click", ".transaction_btn", function() {
+		$(this).prop("disabled", true);
+	});
+
+	/* CREATE STUDENT FORM */
 
 	var createStudentButtonExists = document.getElementById("create_student_submit"); 	
 
 	if (createStudentButtonExists != null) {
-		document.getElementById("create_student_submit").disabled = true;
+		createStudentButtonExists.disabled = true;
 
 		setInterval(
 			function(){
-				var firstName = $("#id_first_name").val().length;
-				var secondName = $("#id_second_name").val().length;
-				var thirdName = $("#id_third_name").val().length;
-				var egn = $("#id_egn").val().length;
-				if ((firstName > 0) &&
-					(secondName > 0) &&
-					(thirdName > 0) &&
-					(egn > 0)) {
-					document.getElementById("create_student_submit").disabled = false;
+				var firstNameLength = $("#id_first_name").val().length;
+				var secondNameLength = $("#id_second_name").val().length;
+				var thirdNameLength = $("#id_third_name").val().length;
+				var egnLength = $("#id_egn").val().length;
+				if ((firstNameLength > 0) && (secondNameLength > 0) &&
+					(thirdNameLength > 0) && (egnLength > 0)
+				){
+					createStudentButtonExists.disabled = false;
 				}else{
-					document.getElementById("create_student_submit").disabled = true;
+					createStudentButtonExists.disabled = true;
 				}	
 			},
 			5000
@@ -89,8 +94,26 @@ $(document).ready(function(){
 		}
 	});
 
-	$(document).on("click", ".transaction_btn", function() {
-		$(this).disabled = true;
-	});
+	/* CREATE CAMPAIGN FORM */
+
+	var createCampaignButtonExists = document.getElementById("create_campaign_submit");
+
+	if (createCampaignButtonExists != null){
+		createCampaignButtonExists.disabled = true;
+
+		setInterval(
+			function(){
+				var titleLength = $("#id_title").val().length;
+				var descriptionLength = $("#id_description").val().length;
+
+				if((titleLength > 0) && (descriptionLength > 0)){
+					createCampaignButtonExists.disabled = false;
+				}else{
+					createCampaignButtonExists.disabled = true;
+				}
+			},
+			3000
+		);
+	};
 
 });

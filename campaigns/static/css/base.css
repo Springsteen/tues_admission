@@ -69,3 +69,10 @@ ul.nav:first-child {
 	width: 400px;
 	margin-bottom: 0px;
 }
+
+
+/* CREATE CAMPAIGN FORM */
+
+#create_campaign_form {
+	padding: 1em;
+}

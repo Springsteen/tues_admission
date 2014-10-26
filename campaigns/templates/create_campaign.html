@@ -2,9 +2,9 @@
  
 {% block title %}Създай нова кампания{% endblock %}
 
-{% block new_campaign %}
+{% block create_campaign %}
 
-	<div class="panel panel-primary">
+	<div id="create_campaign_form" class="panel panel-primary">
 		<form method="POST" action="/campaigns/new" role="form">
 			{% csrf_token %}
 			
@@ -16,10 +16,7 @@
 				Описание: <br>{{ form.description }}<br>
 			</div>
 
-			<input type="submit" value="Запази" class="btn btn-primary transaction_btn"/>
-			<!-- {% if error %}
-				{{ error }}
-			{% endif %} -->
+			<input type="submit" value="Запази" id="create_campaign_submit" class="btn btn-primary transaction_btn"/>
 		</form>
 	</div>
 

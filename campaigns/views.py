@@ -46,13 +46,28 @@ def logout_user(request):
 def create_campaign(request):
 	if request.user.is_authenticated():
 		form = CampaignForm(data=request.POST)
-		if form.is_valid():
-			form.save()
-			campaign = Campaign.objects.last()
-			return redirect(campaign)
+		if request.method == "POST":
+			if form.is_valid():
+				form.save()
+				campaign = Campaign.objects.last()
+				messages.success(
+					request, 
+					"Вие успешно създадохте кампания с име %s" % campaign.title
+				)
+				return redirect(campaign)
+			else:
+				messages.warning(
+					request, 
+					"Опитът ви беше неуспешен поради това, че името или описанието са твърде дълги"
+				)
+				return render(request, 'create_campaign.html', {'form': form})
 		else:
-			return render(request, 'new_campaign.html', {'form': form})
+			return render(request, 'create_campaign.html', {'form': form})
 	else:
+		messages.warning(
+			request,
+			"Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
+		)
 		return redirect('/')
 
 def show_campaign(request, campaign_id):
@@ -71,8 +86,16 @@ def show_campaign(request, campaign_id):
 				}
 			)
 		except ObjectDoesNotExist:
-			return redirect('/')
+			messages.warning(
+				request,
+				"Кампанията, която искате да достъпите не съществува"
+			)
+			return redirect('/campaigns')
 	else:
+		messages.warning(
+			request,
+			"Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
+		)
 		return redirect('/')
 
 def search_campaign(request, campaign_id):
@@ -110,79 +133,101 @@ def list_campaigns(request):
 		campaigns = Campaign.objects.all()
 		return render(request, 'list_campaigns.html', {'campaigns': campaigns})
 	else:
+		messages.warning(
+			request,
+			"Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
+		)
 		return redirect('/')
 
 @transaction.atomic
 def create_student(request, campaign_id):
 	if request.user.is_authenticated():		
 		form = StudentForm(request.POST)
-		if form.is_valid():
-			form.save()
-			s = Student.objects.last()
-			s.campaign = Campaign.objects.get(id=campaign_id)
-			s.entry_number = s.campaign.student_set.count() 
-			s = validate_grades(s)
-			s.grades_evaluated = (
-				s.bel_school + s.physics_school + s.bel_exam +
-				s.maths_exam + (4 * s.maths_tues_exam) 
-			)
-			s.save()
-			return redirect(Campaign.objects.get(id=campaign_id))
+		if request.method == "POST":
+			if form.is_valid():
+				form.save()
+				s = Student.objects.last()
+				s.campaign = Campaign.objects.get(id=campaign_id)
+				s.entry_number = s.campaign.student_set.count() + 1
+				s = validate_grades(s)
+				s.grades_evaluated = (
+					s.bel_school + s.physics_school + s.bel_exam +
+					s.maths_exam + (4 * s.maths_tues_exam) 
+				)
+				s.save()
+				messages.success(request, "Ученикът беше успешно записан.")
+				return redirect(Campaign.objects.get(id=campaign_id))
+			else:
+				messages.warning(
+					request, 
+					"Опитът ви беше неуспешен поради това, че сте въвели твърде дълго или невалидно съдържание в някое от полетата"
+				)
+				return render(request, 'create_student.html', {'form': form, 'campaign_id': campaign_id})
 		else:
 			return render(request, 'create_student.html', {'form': form, 'campaign_id': campaign_id})
 	else:
+		messages.warning(
+			request,
+			"Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
+		)
 		return redirect('/')
 
 @transaction.atomic
 def edit_student(request, campaign_id, student_id):
-	if request.user.is_authenticated():	
-		if request.method == 'GET':
-			try:
-				student = Student.objects.get(id = student_id)
+	if request.user.is_authenticated():
+		try:
+			student = Student.objects.get(id = student_id)	
+			form = StudentForm(request.POST or None, instance = student)
+			if request.method == 'GET':
 				campaign = student.campaign
 				return render(
 					request, 'edit_student.html',
-					{'student': student, 'campaign': campaign}
+					{'form': form, 'student': student, 'campaign': campaign}
 				)
-			except ObjectDoesNotExist:
-				return redirect('/')
-		else:
-			student = Student.objects.get(id = student_id)
-			student.first_name = request.POST['first_name']
-			student.second_name = request.POST['second_name']
-			student.third_name = request.POST['third_name']
-			student.egn = request.POST['egn']
-			student.address = request.POST['address']
-			student.previous_school = request.POST['previous_school']
-			student.parent_name = request.POST['parent_name']
-			student.parent_number = request.POST['parent_number']
-			student.bel_school = float(request.POST['bel_school'])
-			student.physics_school = float(request.POST['physics_school'])
-			student.bel_exam = float(request.POST['bel_exam'])
-			student.maths_exam = float(request.POST['maths_exam'])
-			student.maths_tues_exam = float(request.POST['maths_tues_exam'])
-			student.first_choice = request.POST['first_choice']
-			student.second_choice = request.POST['second_choice']
+			else:
+				if form.is_valid():
+					form.save()
+					student = Student.objects.get(id = student_id)
+					student = validate_grades(student)
 
-			student = validate_grades(student)
-
-			student.grades_evaluated = (
-				student.bel_school + student.physics_school + student.bel_exam +
-				student.maths_exam + (4 * student.maths_tues_exam) 
-			)
-			try:
-				student.save()
-				return redirect(Campaign.objects.get(id = student.campaign.id))
-			except ValidationError:
-				return redirect('/')
+					student.grades_evaluated = (
+						student.bel_school + student.physics_school + student.bel_exam +
+						student.maths_exam + (4 * student.maths_tues_exam) 
+					)
+					student.save()
+					messages.success(request, "Вие успешно редактирахте данните на ученика.")
+					return redirect(Campaign.objects.get(id = student.campaign.id))
+				else:
+					messages.warning(
+						request, 
+						"Опитът ви беше неуспешен поради това, че сте въвели твърде дълго или невалидно съдържание в някое от полетата"
+					)
+					return render(
+						request, 'edit_student.html',
+						{'form': form, 'student': student, 'campaign': campaign}
+					)
+		except ObjectDoesNotExist:
+			messages.warning(request, "Опитахте се да достъпите несъщуствуващ ученик.")
+			return redirect('/')
 	else:
+		messages.warning(
+			request,
+			"Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
+		)
 		return redirect('/')
 
 def show_student(request, campaign_id, student_id):
 	if request.user.is_authenticated():	
-		campaign = Campaign.objects.get(id = campaign_id)
-		student = Student.objects.get(id = student_id)
-		return render(request, 'show_student.html', {'campaign': campaign, 'student': student})
+		try:
+			campaign = Campaign.objects.get(id = campaign_id)
+			student = Student.objects.get(id = student_id)
+			return render(request, 'show_student.html', {'campaign': campaign, 'student': student})
+		except ObjectDoesNotExist:
+			messages.warning(
+				request,
+				"Ученикът, който искате да достъпите не съществува"
+			)
+			return redirect('/campaigns')
 	else:
 		return redirect('/')
 
