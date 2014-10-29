@@ -15,5 +15,6 @@ urlpatterns = patterns('',
     url(r'^campaigns/(\d+)/students/(\d+)/$', 'campaigns.views.show_student', name='show_student'),
     url(r'^campaigns/(\d+)/students/(\d+).pdf/$', 'campaigns.views.student_as_pdf', name='student_as_pdf'),
     url(r'^campaigns/(\d+)/students/(\d+)/edit$', 'campaigns.views.edit_student', name='edit_student'),
+    url(r'^campaigns/(\d+)/students/(\d+)/delete$', 'campaigns.views.delete_student', name='delete_student'),
     url(r'^admin/', include(admin.site.urls)),
 )

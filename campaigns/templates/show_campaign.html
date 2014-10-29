@@ -67,6 +67,7 @@
 				<td><center></center></td>
 				<td><center></center></td>
 				<td><center></center></td>
+				<td><center></center></td>
 			</tr>
 		</thead>
 		<tbody>
@@ -81,6 +82,12 @@
 					<td><center><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/">Още данни</a></center></td>
 					<td><center><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/edit">Промени</a></center></td>
 					<td><center><a href="/campaigns/{{ campaign.id }}/students/{{ s.id }}.pdf/">Генерирай формуляр</a></center></td>
+					<td><center>
+						<form method="POST" action="/campaigns/{{campaign.id}}/students/{{s.id}}/delete">
+							{% csrf_token %}
+							<button type="submit">Изтрий</button>
+						</form>
+					</center></td>
 				</tr>
 			{% endfor %}
 		</tbody>

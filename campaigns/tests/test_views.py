@@ -1,15 +1,17 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+from django.contrib.messages.storage.fallback import FallbackStorage
 from django.http import HttpRequest
 from django.test import TestCase
 from campaigns.models import Campaign, Student, Hall
 from campaigns.forms import CampaignForm
-from campaigns.views import (
-	create_campaign, show_campaign, 
-	list_campaigns, create_student,
-	show_student, edit_student,
-	create_hall,
-)
+# from campaigns.views import (
+# 	create_campaign, show_campaign, 
+# 	list_campaigns, create_student,
+# 	show_student, edit_student,
+# 	create_hall,
+# )
+from campaigns.views import *
 
 class Base(TestCase):
 
@@ -54,6 +56,9 @@ class HallPopulationTest(Base):
 
 def make_POST_request_for_hall(user):
 	request = HttpRequest()
+	setattr(request, 'session', 'session')
+	messages = FallbackStorage(request)
+	setattr(request, '_messages', messages)
 	request.method = 'POST'
 	request.POST['name'] = 'hall1'
 	request.POST['capacity'] = 10
@@ -77,6 +82,9 @@ class HallsViewsTest(Base):
 
 def make_POST_request_for_campaign(titleValue, descriptionValue, user):
 	request = HttpRequest()
+	setattr(request, 'session', 'session')
+	messages = FallbackStorage(request)
+	setattr(request, '_messages', messages)
 	request.method = 'POST'
 	request.POST['title'] = titleValue
 	request.POST['description'] = descriptionValue
@@ -88,7 +96,7 @@ class CampaignsViewsTest(Base):
 	def test_does_create_campaign_resolves_the_right_url(self):
 		self.client.login(username='john', password='johnpassword')
 		called = self.client.get('/campaigns/new')
-		self.assertTemplateUsed(called, 'new_campaign.html')
+		self.assertTemplateUsed(called, 'create_campaign.html')
 
 	# Trying to do self.client.post was using GET request for some
 	# reason so i made it that ugly
@@ -165,6 +173,9 @@ def make_POST_request_for_student(user):
 	h = Hall.objects.create(name='a', capacity = 10)
 	h.save()
 	request = HttpRequest()
+	setattr(request, 'session', 'session')
+	messages = FallbackStorage(request)
+	setattr(request, '_messages', messages)
 	request.method = 'POST'
 	request.POST['egn'] = '0011223344'
 	request.POST['first_name'] = 'Asen'
@@ -195,19 +206,19 @@ class StudentViewTest(Base):
 
 	def test_does_create_student_saves_new_student_on_POST_request(self):
 		campaign = Campaign.objects.create(title='a', description='b')
-		self.assertEqual(Student.objects.count(), 0)
+		self.assertEqual(campaign.student_set.count(), 0)
 		response = create_student(
 			make_POST_request_for_student(self.user),
 			campaign.id
 		)
-		self.assertEqual(Student.objects.count(), 1)
+		self.assertEqual(campaign.student_set.count(), 1)
 		self.assertEqual(
 			campaign,
 			Student.objects.first().campaign
 		)
-		self.assertEqual(Student.objects.first().entry_number, 1)
-		self.assertEqual(Student.objects.first().first_name, 'Asen')
-		self.assertEqual(Student.objects.first().egn, '0011223344')
+		self.assertEqual(campaign.student_set.first().entry_number, 1)
+		self.assertEqual(campaign.student_set.first().first_name, 'Asen')
+		self.assertEqual(campaign.student_set.first().egn, '0011223344')
 
 	def test_does_create_student_gives_students_appropriate_entry_numbers(self):	
 		campaign = Campaign.objects.create(title='a', description='b')
@@ -335,11 +346,32 @@ class StudentViewTest(Base):
 		saved_student = Student.objects.get(id = saved_student.id)
 		self.assertEqual(saved_student.grades_evaluated, 38.0)
 
-	# def test_does_delete_student_deletes_the_right_student(self):
-	# 	self.client.login(username='john', password='johnpassword')
-	# 	create_student(
-	# 		make_POST_request_for_student(self.user),
-	# 		campaign.id
-	# 	)
-	# 	self.assertEqual(Student.objects.count(), 1)
-	# 	Student.objects.first()
+	def test_does_delete_student_deletes_the_right_student(self):
+		self.client.login(username='john', password='johnpassword')
+		self.assertEqual(Student.objects.count(), 0)
+		campaign = Campaign.objects.create(title='a', description='b')
+		create_student(
+			make_POST_request_for_student(self.user),
+			campaign.id
+		)
+		self.assertEqual(Student.objects.count(), 1)
+		student = Student.objects.last()
+		request = HttpRequest()
+		request.method = "POST"
+		delete_student(request, student.campaign_id, student.id)
+		self.assertEqual(Student.objects.count(), 0)
+
+	def test_does_delete_student_deletes_only_if_the_request_method_is_POST(self):
+		self.client.login(username='john', password='johnpassword')
+		self.assertEqual(Student.objects.count(), 0)
+		campaign = Campaign.objects.create(title='a', description='b')
+		create_student(
+			make_POST_request_for_student(self.user),
+			campaign.id
+		)
+		self.assertEqual(Student.objects.count(), 1)
+		student = Student.objects.last()
+		request = HttpRequest()
+		request.method = "GET"
+		delete_student(request, student.campaign_id, student.id)
+		self.assertEqual(Student.objects.count(), 1)

@@ -147,8 +147,8 @@ def create_student(request, campaign_id):
 			if form.is_valid():
 				form.save()
 				s = Student.objects.last()
+				s.entry_number = Campaign.objects.get(id=campaign_id).student_set.count() + 1
 				s.campaign = Campaign.objects.get(id=campaign_id)
-				s.entry_number = s.campaign.student_set.count() + 1
 				s = validate_grades(s)
 				s.grades_evaluated = (
 					s.bel_school + s.physics_school + s.bel_exam +
@@ -215,6 +215,33 @@ def edit_student(request, campaign_id, student_id):
 			"Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
 		)
 		return redirect('/')
+
+def delete_student(request, campaign_id, student_id):
+	if request.user.is_authenticated():
+		if request.method == "POST":
+			student = Student.objects.get(campaign_id = campaign_id, id = student_id)
+			if student is not None:
+				student.delete()
+				messages.success(
+					request,
+					"Вие успешно изтрихте ученика"
+				)
+				return redirect('/campaigns/%s' % campaign_id)
+			else:
+				messages.warning(
+					request,
+					"Опитвате се да изтриете несъществуващ ученик"
+				)
+				return redirect('/campaigns/%s' % campaign_id)
+		else:
+			return redirect('/')
+	else:
+		messages.warning(
+			request,
+			"Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
+		)
+		return redirect('/')
+
 
 def show_student(request, campaign_id, student_id):
 	if request.user.is_authenticated():	
