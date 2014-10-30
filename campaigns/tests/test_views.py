@@ -3,14 +3,8 @@ from django.contrib.auth import authenticate, login
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.http import HttpRequest
 from django.test import TestCase
-from campaigns.models import Campaign, Student, Hall
-from campaigns.forms import CampaignForm
-# from campaigns.views import (
-# 	create_campaign, show_campaign, 
-# 	list_campaigns, create_student,
-# 	show_student, edit_student,
-# 	create_hall,
-# )
+from campaigns.models import *
+from campaigns.forms import *
 from campaigns.views import *
 
 class Base(TestCase):
@@ -54,15 +48,15 @@ class HallPopulationTest(Base):
 		response = self.client.get('/campaigns/%d/halls' % campaign.id)
 		self.assertTemplateUsed(response, 'show_campaign.html')
 
-def make_POST_request_for_hall(user):
+def make_POST_request(user, args_dict):
 	request = HttpRequest()
+	request.method = "POST"
+	request.user = user
 	setattr(request, 'session', 'session')
 	messages = FallbackStorage(request)
 	setattr(request, '_messages', messages)
-	request.method = 'POST'
-	request.POST['name'] = 'hall1'
-	request.POST['capacity'] = 10
-	request.user = user
+	for key in args_dict:
+		request.POST[key] = args_dict[key]
 	return request
 
 class HallsViewsTest(Base):
@@ -76,20 +70,14 @@ class HallsViewsTest(Base):
 	def test_does_create_hall_creates_new_hall_object_with_POST_request(self):
 		campaign = Campaign.objects.create(title = 'a', description = 'b')
 		self.assertEqual(Hall.objects.count(), 0)
-		create_hall(make_POST_request_for_hall(self.user), campaign.id)
+		create_hall(
+			make_POST_request(
+				self.user,
+				{'name': 'hall1', 'capacity': '10'}
+			), 
+			campaign.id
+		)
 		self.assertEqual(Hall.objects.count(), 1)
-
-
-def make_POST_request_for_campaign(titleValue, descriptionValue, user):
-	request = HttpRequest()
-	setattr(request, 'session', 'session')
-	messages = FallbackStorage(request)
-	setattr(request, '_messages', messages)
-	request.method = 'POST'
-	request.POST['title'] = titleValue
-	request.POST['description'] = descriptionValue
-	request.user = user
-	return request
 
 class CampaignsViewsTest(Base):
 
@@ -98,11 +86,10 @@ class CampaignsViewsTest(Base):
 		called = self.client.get('/campaigns/new')
 		self.assertTemplateUsed(called, 'create_campaign.html')
 
-	# Trying to do self.client.post was using GET request for some
-	# reason so i made it that ugly
+	# CHECK THE DOCS FOR self.client.post AND TRY MAKING IT WITH THAT METHOD
 	def test_does_create_campaign_saves_objects_with_POST_requests(self):
 		self.assertEqual(Campaign.objects.count(), 0)
-		create_campaign(make_POST_request_for_campaign('C1', 'C1Descr', self.user))
+		create_campaign(make_POST_request(self.user, {'title': 'C1', 'description': 'C1Descr'}))
 		campaign = Campaign.objects.first()
 		self.assertEqual(Campaign.objects.count(), 1)
 		self.assertEqual(campaign.title, 'C1')
@@ -110,7 +97,7 @@ class CampaignsViewsTest(Base):
 
 	def test_create_campaign_dont_saves_empty_objects(self):
 		self.assertEqual(Campaign.objects.count(), 0)
-		create_campaign(make_POST_request_for_campaign('', '', self.user))
+		create_campaign(make_POST_request(self.user, {'title': '', 'description': ''}))
 		self.assertEqual(Campaign.objects.count(), 0)
 
 	def test_create_campaign_redirects_to_show_campaign_on_success(self):
@@ -169,31 +156,23 @@ class CampaignsViewsTest(Base):
 	# 	response = create_campaign(make_POST_request_for_campaign('',''))
 	# 	self.assertContains(response.content.decode(), EMPTY_CAMPAIGN_FIELDS_ERROR)	
 
-def make_POST_request_for_student(user):
-	h = Hall.objects.create(name='a', capacity = 10)
-	h.save()
-	request = HttpRequest()
-	setattr(request, 'session', 'session')
-	messages = FallbackStorage(request)
-	setattr(request, '_messages', messages)
-	request.method = 'POST'
-	request.POST['egn'] = '0011223344'
-	request.POST['first_name'] = 'Asen'
-	request.POST['second_name'] = 'Asenov'
-	request.POST['third_name'] = 'Asenski'
-	request.POST['address'] = 'address'
-	request.POST['parent_name'] = 'Asen Asenov'
-	request.POST['parent_number'] = '0123456789'
-	request.POST['previous_school'] = 'SOU "ASDF"'
-	request.POST['bel_school'] = 3
-	request.POST['physics_school'] = 4
-	request.POST['bel_exam'] = 5
-	request.POST['maths_exam'] = 4
-	request.POST['maths_tues_exam'] = 5
-	request.POST['first_choice'] = 'SP'
-	request.POST['second_choice'] = 'KM'
-	request.user = user
-	return request
+sample_student_dict = {
+	'egn': '0011223344',
+	'first_name': 'Asen',
+	'second_name': 'Asenov',
+	'third_name': 'Asenski',
+	'address': 'ul. Random Randomizer',
+	'parent_name': 'Asen Asenov',
+	'parent_number': '0123456789',
+	'previous_school': 'SOU "Random Randomizer"',
+	'bel_school': '3',
+	'physics_school': '4',
+	'maths_exam': '4',
+	'maths_tues_exam': '5',
+	'bel_exam': '5',
+	'first_choice': 'SP',
+	'second_choice': 'KM'
+}
 
 class StudentViewTest(Base):
 
@@ -208,7 +187,7 @@ class StudentViewTest(Base):
 		campaign = Campaign.objects.create(title='a', description='b')
 		self.assertEqual(campaign.student_set.count(), 0)
 		response = create_student(
-			make_POST_request_for_student(self.user),
+			make_POST_request(self.user, sample_student_dict),
 			campaign.id
 		)
 		self.assertEqual(campaign.student_set.count(), 1)
@@ -224,15 +203,15 @@ class StudentViewTest(Base):
 		campaign = Campaign.objects.create(title='a', description='b')
 		self.assertEqual(Student.objects.count(), 0)
 		create_student(
-			make_POST_request_for_student(self.user),
+			make_POST_request(self.user, sample_student_dict),
 			campaign.id
 		)
 		create_student(
-			make_POST_request_for_student(self.user),
+			make_POST_request(self.user, sample_student_dict),
 			campaign.id
 		)
 		create_student(
-			make_POST_request_for_student(self.user),
+			make_POST_request(self.user, sample_student_dict),
 			campaign.id
 		)
 		self.assertEqual(Student.objects.count(), 3)
@@ -312,7 +291,7 @@ class StudentViewTest(Base):
 			campaign=campaign, first_name='Pesho', second_name='Petrov',
 			third_name='Popov', egn = '1234567891', entry_number=1
 		)
-		response = edit_student(make_POST_request_for_student(self.user), campaign.id, student.id)
+		response = edit_student(make_POST_request(self.user, sample_student_dict), campaign.id, student.id)
 		student = Student.objects.get(id = student.id)
 		self.assertTemplateUsed(response, 'edit_student.html')
 		self.assertEqual(student.first_name, 'Asen')
@@ -324,7 +303,7 @@ class StudentViewTest(Base):
 		self.assertEqual(Student.objects.count(), 0)
 		campaign = Campaign.objects.create(title='a', description='b')
 		create_student(
-			make_POST_request_for_student(self.user),
+			make_POST_request(self.user, sample_student_dict),
 			campaign.id
 		)
 		saved_student = Student.objects.first()
@@ -335,11 +314,11 @@ class StudentViewTest(Base):
 		self.assertEqual(Student.objects.count(), 0)
 		campaign = Campaign.objects.create(title='a', description='b')
 		create_student(
-			make_POST_request_for_student(self.user),
+			make_POST_request(self.user, sample_student_dict),
 			campaign.id
 		)
 		saved_student = Student.objects.first()
-		request = make_POST_request_for_student(self.user)
+		request = make_POST_request(self.user, sample_student_dict)
 		request.POST['bel_school'] = 4
 		request.POST['physics_school'] = 5
 		edit_student(request, campaign.id, saved_student.id)
@@ -351,13 +330,17 @@ class StudentViewTest(Base):
 		self.assertEqual(Student.objects.count(), 0)
 		campaign = Campaign.objects.create(title='a', description='b')
 		create_student(
-			make_POST_request_for_student(self.user),
+			make_POST_request(self.user, sample_student_dict),
 			campaign.id
 		)
 		self.assertEqual(Student.objects.count(), 1)
 		student = Student.objects.last()
 		request = HttpRequest()
 		request.method = "POST"
+		request.user = self.user
+		setattr(request, 'session', 'session')
+		messages = FallbackStorage(request)
+		setattr(request, '_messages', messages)
 		delete_student(request, student.campaign_id, student.id)
 		self.assertEqual(Student.objects.count(), 0)
 
@@ -366,12 +349,13 @@ class StudentViewTest(Base):
 		self.assertEqual(Student.objects.count(), 0)
 		campaign = Campaign.objects.create(title='a', description='b')
 		create_student(
-			make_POST_request_for_student(self.user),
+			make_POST_request(self.user, sample_student_dict),
 			campaign.id
 		)
 		self.assertEqual(Student.objects.count(), 1)
 		student = Student.objects.last()
 		request = HttpRequest()
 		request.method = "GET"
+		request.user = self.user
 		delete_student(request, student.campaign_id, student.id)
 		self.assertEqual(Student.objects.count(), 1)
