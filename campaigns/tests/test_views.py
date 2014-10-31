@@ -28,10 +28,6 @@ class HomePageTest(Base):
 		response = self.client.get('/logout')
 		self.assertRedirects(response, '/')
 
-	def test_does_home_page_does_not_contain_login_form_if_user_is_authenticated(self):
-		pass
-
-
 class HallPopulationTest(Base):
 
 	def test_does_populate_halls_resolves_the_right_url(self):
@@ -48,7 +44,7 @@ class HallPopulationTest(Base):
 		response = self.client.get('/campaigns/%d/halls' % campaign.id)
 		self.assertTemplateUsed(response, 'show_campaign.html')
 
-def make_POST_request(user, args_dict):
+def build_POST_request(user, args_dict):
 	request = HttpRequest()
 	request.method = "POST"
 	request.user = user
@@ -71,13 +67,44 @@ class HallsViewsTest(Base):
 		campaign = Campaign.objects.create(title = 'a', description = 'b')
 		self.assertEqual(Hall.objects.count(), 0)
 		create_hall(
-			make_POST_request(
+			build_POST_request(
 				self.user,
 				{'name': 'hall1', 'capacity': '10'}
 			), 
 			campaign.id
 		)
 		self.assertEqual(Hall.objects.count(), 1)
+
+	def test_does_delete_hall_deletes_the_right_hall(self):
+		campaign = Campaign.objects.create(title = 'a', description = 'b')
+		self.assertEqual(Hall.objects.count(), 0)
+		create_hall(
+			build_POST_request(self.user, {'name': 'h1', 'capacity': '10'}),
+			campaign.id
+		)
+		self.assertEqual(Hall.objects.count(), 1)
+		hall = Hall.objects.first()
+		delete_hall(build_POST_request(self.user, {}), campaign.id, hall.id)
+		self.assertEqual(Hall.objects.count(), 0)
+
+	def test_does_delete_hall_doesnt_works_with_other_than_POST_requests(self):
+		request = HttpRequest()
+		request.method = "GET"
+		request.user = self.user
+		setattr(request, 'session', 'session')
+		messages = FallbackStorage(request)
+		setattr(request, '_messages', messages)
+		campaign = Campaign.objects.create(title = 'a', description = 'b')
+		self.assertEqual(Hall.objects.count(), 0)
+		create_hall(
+			build_POST_request(self.user, {'name': 'h1', 'capacity': '10'}),
+			campaign.id
+		)
+		self.assertEqual(Hall.objects.count(), 1)
+		hall = Hall.objects.first()
+		delete_hall(request, campaign.id, hall.id)
+		self.assertEqual(Hall.objects.count(), 1)
+
 
 class CampaignsViewsTest(Base):
 
@@ -89,7 +116,7 @@ class CampaignsViewsTest(Base):
 	# CHECK THE DOCS FOR self.client.post AND TRY MAKING IT WITH THAT METHOD
 	def test_does_create_campaign_saves_objects_with_POST_requests(self):
 		self.assertEqual(Campaign.objects.count(), 0)
-		create_campaign(make_POST_request(self.user, {'title': 'C1', 'description': 'C1Descr'}))
+		create_campaign(build_POST_request(self.user, {'title': 'C1', 'description': 'C1Descr'}))
 		campaign = Campaign.objects.first()
 		self.assertEqual(Campaign.objects.count(), 1)
 		self.assertEqual(campaign.title, 'C1')
@@ -97,7 +124,7 @@ class CampaignsViewsTest(Base):
 
 	def test_create_campaign_dont_saves_empty_objects(self):
 		self.assertEqual(Campaign.objects.count(), 0)
-		create_campaign(make_POST_request(self.user, {'title': '', 'description': ''}))
+		create_campaign(build_POST_request(self.user, {'title': '', 'description': ''}))
 		self.assertEqual(Campaign.objects.count(), 0)
 
 	def test_create_campaign_redirects_to_show_campaign_on_success(self):
@@ -133,8 +160,6 @@ class CampaignsViewsTest(Base):
 
 	def test_does_show_campaign_lists_all_students_enrolled_in_it(self):
 		pass
-		# campaign = Campaign.objects.create(title = 'alright', description = 'base')
-		# student1 = Student.objects.create()
 
 	def test_does_list_campaigns_resolves_the_right_url(self):
 		self.client.login(username='john', password='johnpassword')
@@ -143,8 +168,8 @@ class CampaignsViewsTest(Base):
 
 	def test_does_list_campaigns_renders_all_campaigns(self):
 		self.assertEqual(Campaign.objects.count(), 0)
-		Campaign.objects.create(title = 'first', description='first_d').save()
-		Campaign.objects.create(title = 'second', description='second_d').save()
+		Campaign.objects.create(title = 'first', description='first_d')
+		Campaign.objects.create(title = 'second', description='second_d')
 		self.assertEqual(Campaign.objects.count(), 2)
 		request = HttpRequest()
 		request.user = self.user
@@ -152,9 +177,27 @@ class CampaignsViewsTest(Base):
 		self.assertContains(response,'first')
 		self.assertContains(response,'second_d')
 
-	# def test_does_create_campaign_return_error_messages_on_failed_validation(self):
-	# 	response = create_campaign(make_POST_request_for_campaign('',''))
-	# 	self.assertContains(response.content.decode(), EMPTY_CAMPAIGN_FIELDS_ERROR)	
+	def test_does_delete_campaign_deletes_the_right_campaign(self):
+		self.assertEqual(Campaign.objects.count(), 0)
+		Campaign.objects.create(title = 'first', description='first_d')
+		self.assertEqual(Campaign.objects.count(), 1)
+		delete_campaign(
+			build_POST_request(self.user, {}), 
+			Campaign.objects.first().id
+		)
+		self.assertEqual(Campaign.objects.count(), 0)
+		
+	def test_does_delete_campaign_works_only_with_POST_requests(self):
+		self.assertEqual(Campaign.objects.count(), 0)
+		Campaign.objects.create(title = 'first', description='first_d')
+		self.assertEqual(Campaign.objects.count(), 1)
+		request = HttpRequest()
+		request.method = "GET"
+		request.user = self.user
+		delete_campaign(request, Campaign.objects.first().id)
+		self.assertEqual(Campaign.objects.count(), 1)
+
+
 
 sample_student_dict = {
 	'egn': '0011223344',
@@ -187,7 +230,7 @@ class StudentViewTest(Base):
 		campaign = Campaign.objects.create(title='a', description='b')
 		self.assertEqual(campaign.student_set.count(), 0)
 		response = create_student(
-			make_POST_request(self.user, sample_student_dict),
+			build_POST_request(self.user, sample_student_dict),
 			campaign.id
 		)
 		self.assertEqual(campaign.student_set.count(), 1)
@@ -203,15 +246,15 @@ class StudentViewTest(Base):
 		campaign = Campaign.objects.create(title='a', description='b')
 		self.assertEqual(Student.objects.count(), 0)
 		create_student(
-			make_POST_request(self.user, sample_student_dict),
+			build_POST_request(self.user, sample_student_dict),
 			campaign.id
 		)
 		create_student(
-			make_POST_request(self.user, sample_student_dict),
+			build_POST_request(self.user, sample_student_dict),
 			campaign.id
 		)
 		create_student(
-			make_POST_request(self.user, sample_student_dict),
+			build_POST_request(self.user, sample_student_dict),
 			campaign.id
 		)
 		self.assertEqual(Student.objects.count(), 3)
@@ -276,12 +319,12 @@ class StudentViewTest(Base):
 		response = self.client.get('/campaigns/%d/students/%d/edit' % (campaign.id, student.id))
 		self.assertTemplateUsed(response, 'edit_student.html')
 
-	def test_does_edit_student_redirects_to_the_root_url_if_ids_does_not_exist(self):
+	def test_does_edit_student_redirects_to_the_campaigns_url_if_ids_does_not_exist(self):
 		self.client.login(username='john', password='johnpassword')
 		self.assertEqual(Campaign.objects.count(), 0)
 		self.assertEqual(Student.objects.count(), 0)
 		response = self.client.get('/campaigns/%d/students/%d/edit' % (0, 0))
-		self.assertRedirects(response, '/')
+		self.assertRedirects(response, '/campaigns')
 
 	def test_does_edit_student_saves_the_edited_fields_correctly(self):
 		self.assertEqual(Campaign.objects.count(), 0)
@@ -291,7 +334,7 @@ class StudentViewTest(Base):
 			campaign=campaign, first_name='Pesho', second_name='Petrov',
 			third_name='Popov', egn = '1234567891', entry_number=1
 		)
-		response = edit_student(make_POST_request(self.user, sample_student_dict), campaign.id, student.id)
+		response = edit_student(build_POST_request(self.user, sample_student_dict), campaign.id, student.id)
 		student = Student.objects.get(id = student.id)
 		self.assertTemplateUsed(response, 'edit_student.html')
 		self.assertEqual(student.first_name, 'Asen')
@@ -303,7 +346,7 @@ class StudentViewTest(Base):
 		self.assertEqual(Student.objects.count(), 0)
 		campaign = Campaign.objects.create(title='a', description='b')
 		create_student(
-			make_POST_request(self.user, sample_student_dict),
+			build_POST_request(self.user, sample_student_dict),
 			campaign.id
 		)
 		saved_student = Student.objects.first()
@@ -314,11 +357,11 @@ class StudentViewTest(Base):
 		self.assertEqual(Student.objects.count(), 0)
 		campaign = Campaign.objects.create(title='a', description='b')
 		create_student(
-			make_POST_request(self.user, sample_student_dict),
+			build_POST_request(self.user, sample_student_dict),
 			campaign.id
 		)
 		saved_student = Student.objects.first()
-		request = make_POST_request(self.user, sample_student_dict)
+		request = build_POST_request(self.user, sample_student_dict)
 		request.POST['bel_school'] = 4
 		request.POST['physics_school'] = 5
 		edit_student(request, campaign.id, saved_student.id)
@@ -330,17 +373,12 @@ class StudentViewTest(Base):
 		self.assertEqual(Student.objects.count(), 0)
 		campaign = Campaign.objects.create(title='a', description='b')
 		create_student(
-			make_POST_request(self.user, sample_student_dict),
+			build_POST_request(self.user, sample_student_dict),
 			campaign.id
 		)
 		self.assertEqual(Student.objects.count(), 1)
 		student = Student.objects.last()
-		request = HttpRequest()
-		request.method = "POST"
-		request.user = self.user
-		setattr(request, 'session', 'session')
-		messages = FallbackStorage(request)
-		setattr(request, '_messages', messages)
+		request = build_POST_request(self.user, {})
 		delete_student(request, student.campaign_id, student.id)
 		self.assertEqual(Student.objects.count(), 0)
 
@@ -349,7 +387,7 @@ class StudentViewTest(Base):
 		self.assertEqual(Student.objects.count(), 0)
 		campaign = Campaign.objects.create(title='a', description='b')
 		create_student(
-			make_POST_request(self.user, sample_student_dict),
+			build_POST_request(self.user, sample_student_dict),
 			campaign.id
 		)
 		self.assertEqual(Student.objects.count(), 1)

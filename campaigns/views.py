@@ -70,10 +70,38 @@ def create_campaign(request):
 		)
 		return redirect('/')
 
+@transaction.atomic
+def delete_campaign(request, campaign_id):
+	if request.user.is_authenticated():
+		if request.method == "POST":
+			campaign = get_object_or_none(Campaign, id = campaign_id)
+			if campaign is not None:
+				campaign.delete()
+				messages.success(
+					request,
+					"Вие успешно изтрихте кампания"
+				)
+				return redirect('/campaigns')
+			else:
+				messages.warning(
+					request,
+					"Вие се опитахте да изтриете несъществуваща кампания"
+				)
+				return redirect('/campaigns')
+		else:
+			return redirect('/')
+	else:
+		messages.warning(
+			request,
+			"Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
+		)
+		return redirect('/')
+
+
 def show_campaign(request, campaign_id):
 	if request.user.is_authenticated():
-		try:
-			campaign = Campaign.objects.get(id = campaign_id)
+		campaign = get_object_or_none(Campaign, id = campaign_id)
+		if campaign is not None:	
 			students = campaign.student_set.order_by("-entry_number").all()
 			halls = campaign.hall_set.all()
 			return render(
@@ -85,7 +113,7 @@ def show_campaign(request, campaign_id):
 					'halls': halls
 				}
 			)
-		except ObjectDoesNotExist:
+		else:
 			messages.warning(
 				request,
 				"Кампанията, която искате да достъпите не съществува"
@@ -98,6 +126,7 @@ def show_campaign(request, campaign_id):
 		)
 		return redirect('/')
 
+# EXCEPTION HANDLING, USER AUTHENTICATION
 def search_campaign(request, campaign_id):
 	campaign = Campaign.objects.get(id = campaign_id)
 
@@ -143,32 +172,36 @@ def list_campaigns(request):
 def create_student(request, campaign_id):
 	if request.user.is_authenticated():		
 		form = StudentForm(request.POST)
-		if request.method == "POST":
-			if form.is_valid():
-				form.save()
-				s = Student.objects.last()
-				student_count = Campaign.objects.get(id = campaign_id).student_set.count()
-				for i in range(student_count+1):
-					if get_object_or_none(Student, entry_number = (i+1)) is None:
-						s.entry_number = (i+1)
-						break
-				s.campaign = Campaign.objects.get(id=campaign_id)
-				s = validate_grades(s)
-				s.grades_evaluated = (
-					s.bel_school + s.physics_school + s.bel_exam +
-					s.maths_exam + (4 * s.maths_tues_exam) 
-				)
-				s.save()
-				messages.success(request, "Ученикът беше успешно записан.")
-				return redirect(Campaign.objects.get(id=campaign_id))
+		campaign = get_object_or_none(Campaign, id = campaign_id)
+		if campaign is not None:	
+			if request.method == "POST":
+				if form.is_valid():
+					form.save()
+					s = Student.objects.last()
+					student_count = campaign.student_set.count()
+					for i in range(student_count+1):
+						if get_object_or_none(Student, entry_number = (i+1)) is None:
+							s.entry_number = (i+1)
+							break
+					s.campaign = campaign
+					s = validate_grades(s)
+					s.grades_evaluated = (
+						s.bel_school + s.physics_school + s.bel_exam +
+						s.maths_exam + (4 * s.maths_tues_exam) 
+					)
+					s.save()
+					messages.success(request, "Ученикът беше успешно записан.")
+					return redirect(campaign)
+				else:
+					messages.warning(
+						request, 
+						"Опитът ви беше неуспешен поради това, че сте въвели твърде дълго или невалидно съдържание в някое от полетата"
+					)
+					return render(request, 'create_student.html', {'form': form, 'campaign_id': campaign_id})
 			else:
-				messages.warning(
-					request, 
-					"Опитът ви беше неуспешен поради това, че сте въвели твърде дълго или невалидно съдържание в някое от полетата"
-				)
 				return render(request, 'create_student.html', {'form': form, 'campaign_id': campaign_id})
 		else:
-			return render(request, 'create_student.html', {'form': form, 'campaign_id': campaign_id})
+			return redirect('/campaigns')
 	else:
 		messages.warning(
 			request,
@@ -179,8 +212,9 @@ def create_student(request, campaign_id):
 @transaction.atomic
 def edit_student(request, campaign_id, student_id):
 	if request.user.is_authenticated():
-		try:
-			student = Student.objects.get(id = student_id)	
+		student = get_object_or_none(Student, id = student_id)
+		campaign = get_object_or_none(Campaign, id = campaign_id)
+		if (student is not None) and (campaign is not None):	
 			form = StudentForm(request.POST or None, instance = student)
 			if request.method == 'GET':
 				campaign = student.campaign
@@ -191,16 +225,20 @@ def edit_student(request, campaign_id, student_id):
 			else:
 				if form.is_valid():
 					form.save()
-					student = Student.objects.get(id = student_id)
-					student = validate_grades(student)
+					student = get_object_or_none(Student, id = student_id)
+					if student is not None:	
+						student = validate_grades(student)
 
-					student.grades_evaluated = (
-						student.bel_school + student.physics_school + student.bel_exam +
-						student.maths_exam + (4 * student.maths_tues_exam) 
-					)
-					student.save()
-					messages.success(request, "Вие успешно редактирахте данните на ученика.")
-					return redirect(Campaign.objects.get(id = student.campaign.id))
+						student.grades_evaluated = (
+							student.bel_school + student.physics_school + student.bel_exam +
+							student.maths_exam + (4 * student.maths_tues_exam) 
+						)
+						student.save()
+						messages.success(request, "Вие успешно редактирахте данните на ученика.")
+						return redirect(campaign)
+					else:
+						messages.warning(request, "Ученикът не може да бъде достъпен")
+						return redirect(campaign)			
 				else:
 					messages.warning(
 						request, 
@@ -210,9 +248,9 @@ def edit_student(request, campaign_id, student_id):
 						request, 'edit_student.html',
 						{'form': form, 'student': student, 'campaign': campaign}
 					)
-		except ObjectDoesNotExist:
+		else:
 			messages.warning(request, "Опитахте се да достъпите несъщуствуващ ученик.")
-			return redirect('/')
+			return redirect('/campaigns')
 	else:
 		messages.warning(
 			request,
@@ -220,10 +258,11 @@ def edit_student(request, campaign_id, student_id):
 		)
 		return redirect('/')
 
+@transaction.atomic
 def delete_student(request, campaign_id, student_id):
 	if request.user.is_authenticated():
 		if request.method == "POST":
-			student = Student.objects.get(campaign_id = campaign_id, id = student_id)
+			student = get_object_or_none(Student, campaign_id = campaign_id, id = student_id)
 			if student is not None:
 				student.delete()
 				messages.success(
@@ -249,24 +288,37 @@ def delete_student(request, campaign_id, student_id):
 
 def show_student(request, campaign_id, student_id):
 	if request.user.is_authenticated():	
-		try:
-			campaign = Campaign.objects.get(id = campaign_id)
-			student = Student.objects.get(id = student_id)
+		campaign = get_object_or_none(Campaign, id = campaign_id)
+		student = get_object_or_none(Student, id = student_id)
+		if (campaign is not None) and (student is not None):
 			return render(request, 'show_student.html', {'campaign': campaign, 'student': student})
-		except ObjectDoesNotExist:
+		else:
 			messages.warning(
 				request,
 				"Ученикът, който искате да достъпите не съществува"
 			)
+			if campaign is not None:
+				return redirect(campaign)
 			return redirect('/campaigns')
 	else:
+		messages.warning(
+			request,
+			"Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
+		)
 		return redirect('/')
 
 def student_as_pdf(request, campaign_id, student_id):
 	if request.user.is_authenticated():	
+		student = get_object_or_none(Student, id = student_id)
+		campaign = get_object_or_none(Campaign, id = campaign_id)
+		if (student is None) or (campaign is None):
+			if campaign is not None:
+				return redirect(campaign) 
+			else:
+				return redirect('/campaigns')
+
 		response = HttpResponse(content_type='application/pdf')
 		response['Content-Disposition'] = ('attachment; filename="%s.pdf"' % student_id)
-		student = Student.objects.get(id = student_id)
 		enc = 'UTF-8'
 		pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf',enc))
 		pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf',enc))
@@ -328,6 +380,7 @@ def student_as_pdf(request, campaign_id, student_id):
 	else:
 		return redirect('/')
 
+@transaction.atomic
 def create_hall(request, campaign_id):
 	if request.user.is_authenticated():	
 		if request.method == 'GET':
@@ -344,8 +397,37 @@ def create_hall(request, campaign_id):
 			except ValidationError:
 				return redirect('/')
 	else:
+		messages.warning(
+			request,
+			"Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
+		)
 		return redirect('/')
 
+@transaction.atomic
+def delete_hall(request, campaign_id, hall_id):
+	if request.user.is_authenticated():
+		if request.method == "POST":
+			hall = get_object_or_none(Hall, campaign_id = campaign_id, id = hall_id)
+			campaign = get_object_or_none(Campaign, id = campaign_id)
+			if (hall is not None) and (campaign is not None):
+				hall.delete()
+				messages.success(request, "Вие успешно изтрихте залата")
+				return redirect (campaign)
+			else:
+				messages.warning(request, "Опитахте се да изтриете несъществуваща зала")
+				if campaign is not None:
+					return redirect(campaign)
+				return redirect('/')
+		else:
+			return redirect('/')
+	else:
+		messages.warning(
+			request,
+			"Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
+		)
+		return redirect('/')
+
+@transaction.atomic
 def populate_halls(request, campaign_id):
 	if request.user.is_authenticated():
 		result = check_for_capacity(
@@ -367,6 +449,10 @@ def populate_halls(request, campaign_id):
 				'students': Campaign.objects.get(id = campaign_id).student_set.all()
 			})
 	else:
+		messages.warning(
+			request,
+			"Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
+		)
 		return redirect('/')
 
 def export_as_csv(request, campaign_id):
@@ -404,6 +490,10 @@ def export_as_csv(request, campaign_id):
 
 		return response
 	else:
+		messages.warning(
+			request,
+			"Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
+		)
 		return redirect('/')
 
 
