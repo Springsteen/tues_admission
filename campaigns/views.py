@@ -74,7 +74,7 @@ def show_campaign(request, campaign_id):
 	if request.user.is_authenticated():
 		try:
 			campaign = Campaign.objects.get(id = campaign_id)
-			students = campaign.student_set.all()
+			students = campaign.student_set.order_by("-entry_number").all()
 			halls = campaign.hall_set.all()
 			return render(
 				request, 
@@ -147,7 +147,11 @@ def create_student(request, campaign_id):
 			if form.is_valid():
 				form.save()
 				s = Student.objects.last()
-				s.entry_number = Campaign.objects.get(id=campaign_id).student_set.count() + 1
+				student_count = Campaign.objects.get(id = campaign_id).student_set.count()
+				for i in range(student_count+1):
+					if get_object_or_none(Student, entry_number = (i+1)) is None:
+						s.entry_number = (i+1)
+						break
 				s.campaign = Campaign.objects.get(id=campaign_id)
 				s = validate_grades(s)
 				s.grades_evaluated = (
@@ -440,4 +444,8 @@ def validate_grades(student):
 
 	return student		
 
-
+def get_object_or_none(model, **kwargs):
+	try:
+		return model.objects.get(**kwargs)
+	except:
+		return None
