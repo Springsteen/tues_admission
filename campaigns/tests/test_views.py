@@ -13,7 +13,6 @@ class Base(TestCase):
 		User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
 		self.user = authenticate(username='john', password='johnpassword')
 
-
 	def tearDown(self):
 		User.objects.get(id = self.user.id).delete()
 
@@ -74,6 +73,33 @@ class HallsViewsTest(Base):
 			campaign.id
 		)
 		self.assertEqual(Hall.objects.count(), 1)
+
+	def test_does_edit_hall_resolves_the_right_url(self):
+		self.client.login(username='john', password='johnpassword')
+		campaign = Campaign.objects.create(title = 'a', description = 'b')
+		hall = Hall.objects.create(name='abv', capacity=50, campaign = campaign)
+		called = self.client.get('/campaigns/%d/halls/%d/edit' % (campaign.id, hall.id))
+		self.assertTemplateUsed(called, 'edit_hall.html')
+
+	def test_does_edit_hall_saves_edit_fields_correctly(self):
+		campaign = Campaign.objects.create(title = 'a', description = 'b')
+		self.assertEqual(Hall.objects.count(), 0)
+		create_hall(
+			build_POST_request(self.user, {'name': 'h1', 'capacity': '10'}),
+			campaign.id
+		)
+		self.assertEqual(Hall.objects.count(), 1)
+		hall = Hall.objects.first() 
+		edit_hall(
+			build_POST_request(self.user, {'name': 'h2', 'capacity': '20'}),
+			campaign.id,
+			hall.id
+		)
+		self.assertEqual(Hall.objects.count(), 1)
+		hall = Hall.objects.first()
+		self.assertEqual(hall.name, 'h2')
+		self.assertEqual(hall.capacity, 20)
+
 
 	def test_does_delete_hall_deletes_the_right_hall(self):
 		campaign = Campaign.objects.create(title = 'a', description = 'b')

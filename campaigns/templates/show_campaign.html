@@ -48,8 +48,13 @@
 				<tr>
 					<td><center>{{ h.name }}</center></td>
 					<td><center>{{ h.capacity }}</center></td>
-					<td><center>Промени</center></td>
-					<td><center>Изтрий</center></td>
+					<td><center><a href="/campaigns/{{campaign.id}}/halls/{{h.id}}/edit">Промени</a></center></td>
+					<td><center>
+						<form method="POST" action="/campaigns/{{campaign.id}}/halls/{{h.id}}/delete">
+							{% csrf_token %}
+							<button type="submit">Изтрий</button>
+						</form>
+					</center></td>
 				</tr>
 			{% endfor %}
 		</tbody>

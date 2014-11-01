@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %} Редактиране на зала {% endblock %}
+
+{% block to_the_campaign %}<li class="active"><a href="/campaigns/{{ campaign_id }}/">Към кампанията</a></li>{% endblock %}
+
+{% block edit_hall %}
+
+	<div class="panel panel-primary">
+		
+		<form action="/campaigns/{{campaign.id}}/halls/{{hall.id}}/edit" role="form" method="POST">
+			{% csrf_token %}
+				
+			<div class="panel panel-danger">Име(*): <br>{{ form.name }}<br><br></div>
+			
+			<div class="panel panel-danger">Капацитет(*): <br>{{ form.capacity }}<br><br></div>
+
+			<input type="submit" value="Запази" class="btn btn-primary hall_form_submit transaction_btn" id="edit_hall_submit"/>
+
+		</form>
+
+	</div>
+
+{% endblock %}

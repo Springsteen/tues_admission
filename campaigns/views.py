@@ -5,8 +5,8 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpResponse
 from django.db import transaction
 
-from campaigns.forms import CampaignForm, StudentForm
-from campaigns.models import Campaign, Student, Hall
+from campaigns.forms import *
+from campaigns.models import *
 
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
@@ -45,7 +45,7 @@ def logout_user(request):
 @transaction.atomic
 def create_campaign(request):
 	if request.user.is_authenticated():
-		form = CampaignForm(data=request.POST)
+		form = CampaignForm(request.POST or None)
 		if request.method == "POST":
 			if form.is_valid():
 				form.save()
@@ -76,6 +76,8 @@ def delete_campaign(request, campaign_id):
 		if request.method == "POST":
 			campaign = get_object_or_none(Campaign, id = campaign_id)
 			if campaign is not None:
+				campaign.student_set.all().delete()
+				campaign.hall_set.all().delete()
 				campaign.delete()
 				messages.success(
 					request,
@@ -107,11 +109,7 @@ def show_campaign(request, campaign_id):
 			return render(
 				request, 
 				'show_campaign.html', 
-				{
-					'campaign': campaign, 
-					'students': students,
-					'halls': halls
-				}
+				{'campaign': campaign, 'students': students, 'halls': halls}
 			)
 		else:
 			messages.warning(
@@ -126,9 +124,14 @@ def show_campaign(request, campaign_id):
 		)
 		return redirect('/')
 
-# EXCEPTION HANDLING, USER AUTHENTICATION
 def search_campaign(request, campaign_id):
-	campaign = Campaign.objects.get(id = campaign_id)
+	response = {}
+	
+	campaign = get_object_or_none(Campaign, id = campaign_id)
+	if campaign is None:
+		response['status_code'] = '404'
+		response['status_message'] = 'Campaign not found'
+		return HttpResponse(json.dumps(response), content_type="application/json")
 
 	result_set = campaign.student_set.all().filter(
 		first_name = request.GET['first_name']
@@ -138,11 +141,10 @@ def search_campaign(request, campaign_id):
 		result_set = campaign.student_set.all().filter(
 			egn = request.GET['egn']
 		)
-
-	response = {}
 	
 	if result_set.count() > 0:
-		response['status'] = '200'
+		response['status_code'] = '200'
+		response['status_message'] = 'OK'
 		response['campaign_id'] = campaign_id
 		response['result_set'] = {}
 		result_hash = response['result_set']
@@ -153,8 +155,9 @@ def search_campaign(request, campaign_id):
 			result_hash[student.id]['third_name'] = student.third_name
 			result_hash[student.id]['egn'] = student.egn
 	else:
-		response['status'] = '404'
-	
+		response['status_code'] = '404'
+		response['status_message'] = 'Nothing found'
+
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
 def list_campaigns(request):
@@ -171,7 +174,7 @@ def list_campaigns(request):
 @transaction.atomic
 def create_student(request, campaign_id):
 	if request.user.is_authenticated():		
-		form = StudentForm(request.POST)
+		form = StudentForm(request.POST or None)
 		campaign = get_object_or_none(Campaign, id = campaign_id)
 		if campaign is not None:	
 			if request.method == "POST":
@@ -217,7 +220,6 @@ def edit_student(request, campaign_id, student_id):
 		if (student is not None) and (campaign is not None):	
 			form = StudentForm(request.POST or None, instance = student)
 			if request.method == 'GET':
-				campaign = student.campaign
 				return render(
 					request, 'edit_student.html',
 					{'form': form, 'student': student, 'campaign': campaign}
@@ -383,19 +385,52 @@ def student_as_pdf(request, campaign_id, student_id):
 @transaction.atomic
 def create_hall(request, campaign_id):
 	if request.user.is_authenticated():	
-		if request.method == 'GET':
-			return render(request, 'create_hall.html', {'campaign_id': campaign_id})
-		else:
-			try:
-				hall = Hall.objects.create(
-					name=request.POST['name'], 
-					capacity=request.POST['capacity']
-				)
-				hall.campaign = Campaign.objects.get(id = campaign_id)
+		campaign = get_object_or_none(Campaign, id = campaign_id)
+		if campaign is None:
+			messages.warning(request, "Кампанията към която се оптивате да създадете зала не съществува")
+			return redirect('/')
+
+		form = HallForm(request.POST or None)	
+		if request.method == 'POST':
+			if form.is_valid():
+				form.save()
+				hall = Hall.objects.last()
+				hall.campaign_id = campaign.id
 				hall.save()
-				return redirect('/campaigns/%s/' % campaign_id)
-			except ValidationError:
-				return redirect('/')
+				messages.success(request, "Вие успешно създадохте залата")
+				return redirect(campaign)
+			else:
+				messages.warning(request, "Въвели сте невалидна стойност в някое от полетата")
+				return render(request, 'create_hall.html', {'campaign_id': campaign_id})
+		else:
+			return render(request, 'create_hall.html', {'campaign_id': campaign_id})
+	else:
+		messages.warning(
+			request,
+			"Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
+		)
+		return redirect('/')
+
+@transaction.atomic
+def edit_hall(request, campaign_id, hall_id):
+	if request.user.is_authenticated():
+		hall = get_object_or_none(Hall, campaign_id = campaign_id, id = hall_id)
+		campaign = get_object_or_none(Campaign, id = campaign_id)
+		if (hall is None) or (campaign is None):	
+			messages.warning(request, "Опитвате да изтриете несъществуваща зала")
+			return redirect('/')
+		
+		form = HallForm(request.POST or None, instance = hall)
+		if request.method == "POST":
+			if form.is_valid():
+				form.save()
+				messages.success(request, "Вие успешно редактирахте залата")
+				return redirect(campaign)
+			else:
+				messages.warning(request, "Въвели сте невалидна стойност в някое от полетата")
+				return render(request, 'edit_hall.html', {'form': form, 'campaign': campaign, 'hall': hall})	
+		else:
+			return render(request, 'edit_hall.html', {'form': form, 'campaign': campaign, 'hall': hall})
 	else:
 		messages.warning(
 			request,
@@ -430,23 +465,32 @@ def delete_hall(request, campaign_id, hall_id):
 @transaction.atomic
 def populate_halls(request, campaign_id):
 	if request.user.is_authenticated():
+		campaign = get_object_or_none(Campaign, id = campaign_id)
+		if campaign is None:
+			messages.warning(request, "Кампанията не съществува")
+			redirect('/campaigns')
+
 		result = check_for_capacity(
-			Campaign.objects.get(id = campaign_id).hall_set.all(),
-			Campaign.objects.get(id = campaign_id).student_set.count()
+			campaign.hall_set.all(),
+			campaign.student_set.count()
 		)
 		if result:
 			populate(
-				Campaign.objects.get(id = campaign_id).hall_set.all(), 
-				Campaign.objects.get(id = campaign_id).student_set.all()
+				campaign.hall_set.all(), 
+				campaign.student_set.all()
 			)
 			return render(request, 'populate_halls.html', {
-				'students' : Campaign.objects.get(id = campaign_id).student_set.all(),
+				'students' : campaign.student_set.all(),
 				'campaign_id' : campaign_id
 			})
 		else:
+			messages.warning(
+				request, 
+				"Капацитетът на залите е твърде малък, моля добавете още зали или променете капацитета на съществуващите"
+			)
 			return render(request, 'show_campaign.html', {
-				'campaign': Campaign.objects.get(id = campaign_id), 
-				'students': Campaign.objects.get(id = campaign_id).student_set.all()
+				'campaign': campaign, 
+				'students': campaign.student_set.all()
 			})
 	else:
 		messages.warning(
@@ -466,15 +510,15 @@ def export_as_csv(request, campaign_id):
 		
 		#Student objects are not itterable so im writing the file this way
 		writer.writerow([
-		    	'Входящ номер', 'Име', 
-		    	'Презиме', 'Фамилия',
-		    	'Адрес', 'Имена на родител',
-		    	'Училище', 'БЕЛ-Училище',
-		    	'Физика-Училище', 'БЕЛ-Матура',
-		    	'Математика-Матура', 'Математика-ТУЕС',
-		    	'Първо желание', 'Второ желание',
-		    	'ЕГН'
-		    ])
+		    'Входящ номер', 'Име', 
+		    'Презиме', 'Фамилия',
+		    'Адрес', 'Имена на родител',
+		    'Училище', 'БЕЛ-Училище',
+		   	'Физика-Училище', 'БЕЛ-Матура',
+		    'Математика-Матура', 'Математика-ТУЕС',
+		    'Първо желание', 'Второ желание',
+		    'ЕГН'
+		])
 
 		for student in students:
 			writer.writerow([

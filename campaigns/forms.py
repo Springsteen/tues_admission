@@ -1,5 +1,5 @@
 from django import forms
-from campaigns.models import Campaign, Student
+from campaigns.models import *
 
 class CampaignForm(forms.models.ModelForm):
 
@@ -12,6 +12,20 @@ class CampaignForm(forms.models.ModelForm):
             }),
             'description': forms.fields.TextInput(attrs={
                 'class': 'form-control ',
+            }),
+        }
+
+class HallForm(forms.models.ModelForm):
+
+    class Meta:
+        model = Hall
+        fields = ('name', 'capacity')
+        widgets = {
+            'name': forms.fields.TextInput(attrs={
+                'class': 'form-control',
+            }),
+            'capacity': forms.fields.NumberInput(attrs={
+                'class': 'form-control',
             }),
         }
 
