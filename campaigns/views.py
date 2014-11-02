@@ -411,6 +411,24 @@ def create_hall(request, campaign_id):
 		)
 		return redirect('/')
 
+def show_hall(request, campaign_id, hall_id):
+	if request.user.is_authenticated():	
+		hall = get_object_or_none(Hall, campaign_id = campaign_id, id = hall_id)
+		campaign = get_object_or_none(Campaign, id = campaign_id)
+		if hall is not None:
+			return render(request, 'show_hall.html', {'campaign': campaign, 'hall': hall})
+		else:
+			messages.warning(request, "Залата и/или кампанията не съществуват")
+			if campaign is not None:
+				return redirect(campaign)
+			return redirect('/')
+	else:
+		messages.warning(
+			request,
+			"Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
+		)
+		return redirect('/')		
+
 @transaction.atomic
 def edit_hall(request, campaign_id, hall_id):
 	if request.user.is_authenticated():

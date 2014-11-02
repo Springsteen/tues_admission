@@ -56,6 +56,13 @@ def build_POST_request(user, args_dict):
 
 class HallsViewsTest(Base):
 
+	def test_does_show_campaign_resolves_the_right_url(self):
+		self.client.login(username='john', password='johnpassword')
+		campaign = Campaign.objects.create(title = 'a', description = 'b')
+		hall = Hall.objects.create(name='a', capacity = 10, campaign_id = campaign.id)
+		called = self.client.get('/campaigns/%d/halls/%d/' % (campaign.id, hall.id))
+		self.assertTemplateUsed(called, 'show_hall.html')
+
 	def test_does_create_hall_resolves_the_right_url(self):
 		self.client.login(username='john', password='johnpassword')
 		campaign = Campaign.objects.create(title = 'a', description = 'b')

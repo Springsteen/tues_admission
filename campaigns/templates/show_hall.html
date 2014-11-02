@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Зала{% endblock %}
+
+{% block to_the_campaign %}<li class="active"><a href="/campaigns/{{ campaign.id }}/">Към кампанията</a></li>{% endblock %}
+
+{% block show_hall %}
+	<div class="panel panel-primary">
+		<div class = "panel-body">
+			Име: {{hall.name}}<br><br>
+			Капацитет: {{hall.capacity}}<br><br>
+		</div>
+	</div>
+{% endblock %}
