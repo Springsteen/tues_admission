@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+import sys  
+reload(sys)  
+sys.setdefaultencoding('utf8')
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -584,15 +589,15 @@ def validate_grades(student):
 		return True
 	
 	if not met_constraints(student.bel_school):
-		student.bel_school = 0
+		student.bel_school = 2
 	if not met_constraints(student.bel_exam):
-		student.bel_exam = 0
+		student.bel_exam = 2
 	if not met_constraints(student.maths_exam):
-		student.maths_exam = 0
+		student.maths_exam = 2
 	if not met_constraints(student.maths_tues_exam):
-		student.maths_tues_exam = 0
+		student.maths_tues_exam = 2
 	if not met_constraints(student.physics_school):
-		student.physics_school = 0
+		student.physics_school = 2
 
 	return student		
 
