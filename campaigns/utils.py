@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+from django.http import HttpResponse
+
 from campaigns.models import *
+
+import csv
 
 def get_populated_student_specialties(campaign, system_programing_count, computer_networks_count, start_position):
     student_set = campaign.student_set.all()
@@ -40,3 +44,19 @@ def get_populated_student_specialties(campaign, system_programing_count, compute
     # print(output_set)
 
     return output_set
+
+
+def build_specialties_csv_file_response(information_set):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="results.csv"'
+    writer = csv.writer(response)
+    writer.writerow([
+        'Входящ номер', 'Имена', 'Приет в специалност',
+    ])
+
+    for key, value in information_set.iteritems():
+        writer.writerow([
+            value[1], key, value[0],
+        ])
+
+    return response

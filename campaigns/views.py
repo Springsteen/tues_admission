@@ -14,6 +14,7 @@ from campaigns.forms import *
 from campaigns.models import *
 from campaigns.utils import (
     get_populated_student_specialties,
+    build_specialties_csv_file_response,
 )
 
 from reportlab.pdfgen import canvas
@@ -574,18 +575,22 @@ def populate_student_specialties(request, campaign_id):
             system_programing_count = request.POST['first_specialty_count']
             computer_networks_count = request.POST['second_specialty_count']
             start_position = request.POST['start_position']
+            response_type = request.POST['response_type']
             students_count = campaign.student_set.count()
-            if not start_position >= students_count :
+            if not int(start_position) >= students_count:
                 results = get_populated_student_specialties(
                     campaign,
                     system_programing_count,
                     computer_networks_count,
                     start_position,
                 )
-                return render(request, 'populate_specialties.html', {
-                    'campaign': campaign,
-                    'results': results,
-                })
+                if response_type == 'Уеб страница':
+                    return render(request, 'populate_specialties.html', {
+                        'campaign': campaign,
+                        'results': results,
+                    })
+                else:
+                    return build_specialties_csv_file_response(results)
             else:
                 messages.warning(request, 'Грешна стартова позиция')
         return render(request, 'populate_specialties.html', {
