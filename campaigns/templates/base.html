@@ -7,55 +7,57 @@
 </head>
 
 <body>
-  	<nav class="navbar navbar-default" role="navigation">
-     		<div class="navbar-header">
-        		<a class="navbar-brand" href="/">ELSYS</a>
-     		</div>
-     		<div>
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">ELSYS</a>
+        </div>
+        <div>
             {% if user.is_authenticated %}
                 <ul class="nav navbar-nav">
                     <li class="active"><a href="/campaigns/new">Нова кампания</a></li>
                     <li class="active"><a href="/campaigns">Всички кампании</a></li>
-                    {% block new_student_link %}{% endblock %}  
+                    {% block new_student_link %}{% endblock %}
                     {% block to_the_campaign %}{% endblock %}
                     {% block generate_pdf %}{% endblock %}
                     {% block export_as_csv %}{% endblock %}
                     {% block populate_halls_link %}{% endblock %}
                     {% block create_hall_link %}{% endblock %}
+                    {% block populate_student_specialties_link %}{% endblock %}
                 </ul>
-                
+
                 <ul class="nav navbar-nav navbar-right" id="logout_button">
                     <li class="active"><a href="/logout">Изход</a></li>
                 </ul>
             {% endif %}
-     		</div>
-  	</nav>
+        </div>
+    </nav>
 
-    <div class="information">
-        {% if messages %}
-            {% for message in messages %}
-                {% if message.tags %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }} 
-                    </div>
-                {% endif %}
-            {% endfor %}
-        {% endif %}
-    </div>
 
-  	<div class = "container">
-  		  {% block home %}{% endblock %}
-  		  {% block create_campaign %}{% endblock %}
-  		  {% block show_campaign %}{% endblock %}
-  		  {% block list_campaigns %}{% endblock %}
-  		  {% block create_student %}{% endblock %}
-  		  {% block show_student %}{% endblock %}
+    <div class = "container">
+        <div class="information">
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+        {% block home %}{% endblock %}
+        {% block create_campaign %}{% endblock %}
+        {% block show_campaign %}{% endblock %}
+        {% block list_campaigns %}{% endblock %}
+        {% block create_student %}{% endblock %}
+        {% block show_student %}{% endblock %}
         {% block edit_student %}{% endblock %}
         {% block show_hall %}{% endblock %}
         {% block create_hall %}{% endblock %}
         {% block edit_hall %}{% endblock %}
         {% block populate_halls %}{% endblock %}
-  	</div>
+        {% block populate_specialties %}{% endblock %}
+    </div>
 
     <script type="text/javascript" src="{{ STATIC_URL }}js/form_validations.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/campaign.js"></script>

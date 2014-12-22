@@ -3,37 +3,37 @@
 {% block title %} Списък с кампании {% endblock %}
 
 {% block list_campaigns %}
-	<table class="table table-hover table-bordered">	
-		{% if campaigns %}	
-			<thead>
-				<tr>
-					<td><b><center>№</center></b></td>
-					<td><b><center>Име</center></b></td>
-					<td><b><center>Описание</center></b></td>
-					<td><b><center></center></b></td>
-					<td><b><center></center></b></td>
-				</tr>
-			</thead>
-			<tbody>
-				{% for campaign in campaigns %}
-					<tr>				
-						<td><center>{{ forloop.counter }}</center></td>
-						<td><center>{{ campaign.title }}</center></td>
-						<td><center>{{ campaign.description }}</center></td>
-						<td><center><a href="/campaigns/{{ campaign.id }}/">Още</a></center></td>
-						<td><center>
-							<form method="POST" action="/campaigns/{{ campaign.id }}/delete">
-								{% csrf_token %}
-								<button type="submit">Изтрий</button>
-							</form>
-						</center></td>
-					</tr>
-				{% endfor %}
-			</tbody>
-		{% else %}
-			<div class="alert alert-info">
-				Няма създадени кампании. Моля направете нова, за да продължите.
-			</div>
-		{% endif %}
-	</table>
+    <table class="table table-hover table-bordered">
+        {% if campaigns %}
+            <thead>
+                <tr>
+                    <td><b><center>№</center></b></td>
+                    <td><b><center>Име</center></b></td>
+                    <td><b><center>Описание</center></b></td>
+                    <td><b><center></center></b></td>
+                    <td><b><center></center></b></td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for campaign in campaigns %}
+                    <tr>
+                        <td><center>{{ forloop.counter }}</center></td>
+                        <td><center>{{ campaign.title }}</center></td>
+                        <td><center>{{ campaign.description }}</center></td>
+                        <td><center><a href="/campaigns/{{ campaign.id }}/">Още</a></center></td>
+                        <td><center>
+                            <form method="POST" action="/campaigns/{{ campaign.id }}/delete">
+                                {% csrf_token %}
+                                <button type="submit">Изтрий</button>
+                            </form>
+                        </center></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        {% else %}
+            <div class="alert alert-info">
+                Няма създадени кампании. Моля направете нова, за да продължите.
+            </div>
+        {% endif %}
+    </table>
 {% endblock %}

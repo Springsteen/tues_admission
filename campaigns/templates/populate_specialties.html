@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Класиране{% endblock %}
+
+{% block to_the_campaign %}<li class="active"><a href="/campaigns/{{ campaign.id }}/">Към кампанията</a></li>{% endblock %}
+
+{% block populate_specialties %}
+    {% if results %}
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <td><b><center>Входящ номер</center></b></td>
+                    <td><b><center>Ученик</center></b></td>
+                    <td><b><center>Специалност</center></b></td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in results.items %}
+                    <tr>
+                        <td>{{ value.1 }}</td>
+                        <td>{{ key }}</td>
+                        <td>{{ value.0 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+
+        <div class="panel panel-primary" id="populate_specialties_form">
+            <form method="POST" action='/campaigns/{{ campaign.id }}/specialties'>
+                {% csrf_token %}
+
+                <div class="panel panel-danger">
+                    <label>Системно програмиране</label>
+                    <input name="first_specialty_count"/>
+                </div>
+
+                <div class="panel panel-danger">
+                    <label>Компютърни мрежи</label>
+                    <input name="second_specialty_count"/>
+                </div>
+
+                <div class="panel panel-danger">
+                    <label>Начална позиция</label>
+                    <input name="start_position"/>
+                </div>
+
+                <input type="submit" value="Класирай" class="btn btn-primary populate_specialties_submit transaction_btn" id="populate_specialties_submit"/>
+            </form>
+        </div>
+
+    {% endif %}
+{% endblock %}

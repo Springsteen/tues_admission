@@ -1,23 +1,23 @@
 {% extends 'base.html' %}
- 
+
 {% block title %}Създай нова кампания{% endblock %}
 
 {% block create_campaign %}
 
-	<div id="create_campaign_form" class="panel panel-primary">
-		<form method="POST" action="/campaigns/new" role="form">
-			{% csrf_token %}
-			
-			<div class="form-group">
-				Име: <br>{{ form.title }}<br>
-			</div>
+    <div id="create_campaign_form" class="panel panel-primary">
+        <form method="POST" action="/campaigns/new" role="form">
+            {% csrf_token %}
 
-			<div class="form-group">
-				Описание: <br>{{ form.description }}<br>
-			</div>
+            <div class="form-group">
+                Име: <br>{{ form.title }}<br>
+            </div>
 
-			<input type="submit" value="Запази" id="create_campaign_submit" class="btn btn-primary transaction_btn"/>
-		</form>
-	</div>
+            <div class="form-group">
+                Описание: <br>{{ form.description }}<br>
+            </div>
+
+            <input type="submit" value="Запази" id="create_campaign_submit" class="btn btn-primary transaction_btn"/>
+        </form>
+    </div>
 
 {% endblock %}

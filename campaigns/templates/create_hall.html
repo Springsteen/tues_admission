@@ -5,15 +5,15 @@
 {% block to_the_campaign %}<li class="active"><a href="/campaigns/{{ campaign_id }}/">Към кампанията</a></li>{% endblock %}
 
 {% block create_hall %}
-	<div class="panel panel-primary">
-		<form method="POST" action="/campaigns/{{campaign_id}}/halls/new" role="form">
-			{% csrf_token %}
+    <div class="panel panel-primary">
+        <form method="POST" action="/campaigns/{{campaign_id}}/halls/new" role="form">
+            {% csrf_token %}
 
-			Име: <br><input type="text" name="name"><br><br>
+            Име: <br><input type="text" name="name"><br><br>
 
-			Капацитет: <br><input type="text" name="capacity"><br><br>
+            Капацитет: <br><input type="text" name="capacity"><br><br>
 
-			<input type="submit" value="Запази" class="btn btn-primary transaction_btn"/>
-		</form>
-	</div>
+            <input type="submit" value="Запази" class="btn btn-primary transaction_btn"/>
+        </form>
+    </div>
 {% endblock %}

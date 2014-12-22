@@ -6,30 +6,30 @@
 
 {% block populate_halls %}
 
-	<table class="table table-hover table-bordered">
-		<thead>
-			<tr>
-				<td><b>Входящ номер</b></td>
-				<td><b>Име</b></td>
-				<td><b>Презиме</b></td>
-				<td><b>Фамилия</b></td>
-				<td><b>Име на залата</b></td>
-			</tr>
-		</thead>
+    <table class="table table-hover table-bordered">
+        <thead>
+            <tr>
+                <td><b>Входящ номер</b></td>
+                <td><b>Име</b></td>
+                <td><b>Презиме</b></td>
+                <td><b>Фамилия</b></td>
+                <td><b>Име на залата</b></td>
+            </tr>
+        </thead>
 
-		<tbody>
-			{% for s in students %}
-				<tr>				
-					<td>{{ s.entry_number }}</td>
-					<td>{{ s.first_name }}</td>
-					<td>{{ s.second_name }}</td>
-					<td>{{ s.third_name }}</td>
-					<td>{{ s.hall.name }}</td>
-				</tr>
-			{% endfor %}
-		</tbody>
+        <tbody>
+            {% for s in students %}
+                <tr>
+                    <td>{{ s.entry_number }}</td>
+                    <td>{{ s.first_name }}</td>
+                    <td>{{ s.second_name }}</td>
+                    <td>{{ s.third_name }}</td>
+                    <td>{{ s.hall.name }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
 
-	</table>
+    </table>
 
 {% endblock %}
 

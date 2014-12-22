@@ -5,97 +5,98 @@
 {% block export_as_csv %}<li class="active"><a href="/campaigns/{{ campaign.id }}.csv/">Генерирай CSV</a></li>{% endblock %}
 {% block create_hall_link %}<li class="active"><a href="/campaigns/{{ campaign.id }}/halls/new">Нова зала</a></li>{% endblock %}
 {% block populate_halls_link %}<li class="active"><a href="/campaigns/{{ campaign.id }}/halls">Разпредели по зали</a></li>{% endblock %}
+{% block populate_student_specialties_link %}<li class="active"><a href="/campaigns/{{ campaign.id }}/specialties">Класиране</a></li>{% endblock %}
 
 {% block show_campaign %}
-	
-	<div class="row panel panel-success" id="campaign_nav">
-		<div class="col-md-8" id="campaign_search">
-			<div class="form-inline form-group">
-				<input 
-					type="text" 
-					id="search_first_name" 
-					class="form-control campaign_search"
-					placeholder="Собствено име"
-				>
-				<input 
-					type="text" 
-					id="search_egn" 
-					class="form-control campaign_search"
-					placeholder="ЕГН"
-				>
-				<button id='search_campaign_button' class="btn btn-success">Търси</button>
-				<button id='clear_search_campaign_button' class="btn btn-warning">Изчисти</button>
-			</div>
-		</div>
 
-		<div class="col-md-4" id="campaign_checks">
-			Ученици: <input type="checkbox" id="show_campaign">
-			Зали: <input type="checkbox" id="show_campaign_halls">
-		</div>
-	</div>
+    <div class="row panel panel-success" id="campaign_nav">
+        <div class="col-md-8" id="campaign_search">
+            <div class="form-inline form-group">
+                <input
+                    type="text"
+                    id="search_first_name"
+                    class="form-control campaign_search"
+                    placeholder="Собствено име"
+                >
+                <input
+                    type="text"
+                    id="search_egn"
+                    class="form-control campaign_search"
+                    placeholder="ЕГН"
+                >
+                <button id='search_campaign_button' class="btn btn-success">Търси</button>
+                <button id='clear_search_campaign_button' class="btn btn-warning">Изчисти</button>
+            </div>
+        </div>
 
-	<table id="show_campaign_halls_table" class="table table-hover table-bordered">
-		<thead>
-			<tr>
-				<td><center><b>Име на залата</b></center></td>
-				<td><center><b>Капацитет на залата</b></center></td>
-				<td></td>
-				<td></td>
-			</tr>
-		</thead>
-		<tbody>
-			{% for h in halls %}
-				<tr>
-					<td><center>{{ h.name }}</center></td>
-					<td><center>{{ h.capacity }}</center></td>
-					<td><center><a href="/campaigns/{{campaign.id}}/halls/{{h.id}}/edit">Промени</a></center></td>
-					<td><center>
-						<form method="POST" action="/campaigns/{{campaign.id}}/halls/{{h.id}}/delete">
-							{% csrf_token %}
-							<button type="submit">Изтрий</button>
-						</form>
-					</center></td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+        <div class="col-md-4" id="campaign_checks">
+            Ученици: <input type="checkbox" id="show_campaign">
+            Зали: <input type="checkbox" id="show_campaign_halls">
+        </div>
+    </div>
 
-	<table id="show_campaign_table" class="table table-hover table-bordered">	
-		<thead>
-			<tr>
-				<td><center><b>№</b></center></td>
-				<td><center><b>Собствено име</b></center></td>
-				<td><center><b>Презиме</b></center></td>
-				<td><center><b>Фамилия</b></center></td>
-				<td><center><b>ЕГН</b></center></td>
-				<td><center><b>БАЛ</b></center></td>
-				<td><center></center></td>
-				<td><center></center></td>
-				<td><center></center></td>
-				<td><center></center></td>
-			</tr>
-		</thead>
-		<tbody>
-			{% for s in students %}
-				<tr>				
-					<td><center>{{ s.entry_number }}</center></td>
-					<td><center>{{ s.first_name }}</center></td>
-					<td><center>{{ s.second_name }}</center></td>
-					<td><center>{{ s.third_name }}</center></td>
-					<td><center>{{ s.egn }}</center></td>
-					<td><center>{{ s.grades_evaluated }}</center></td>
-					<td><center><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/">Още данни</a></center></td>
-					<td><center><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/edit">Промени</a></center></td>
-					<td><center><a href="/campaigns/{{ campaign.id }}/students/{{ s.id }}.pdf/">Генерирай формуляр</a></center></td>
-					<td><center>
-						<form method="POST" action="/campaigns/{{campaign.id}}/students/{{s.id}}/delete">
-							{% csrf_token %}
-							<button type="submit">Изтрий</button>
-						</form>
-					</center></td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+    <table id="show_campaign_halls_table" class="table table-hover table-bordered">
+        <thead>
+            <tr>
+                <td><center><b>Име на залата</b></center></td>
+                <td><center><b>Капацитет на залата</b></center></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for h in halls %}
+                <tr>
+                    <td><center>{{ h.name }}</center></td>
+                    <td><center>{{ h.capacity }}</center></td>
+                    <td><center><a href="/campaigns/{{campaign.id}}/halls/{{h.id}}/edit">Промени</a></center></td>
+                    <td><center>
+                        <form method="POST" action="/campaigns/{{campaign.id}}/halls/{{h.id}}/delete">
+                            {% csrf_token %}
+                            <button type="submit">Изтрий</button>
+                        </form>
+                    </center></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table id="show_campaign_table" class="table table-hover table-bordered">
+        <thead>
+            <tr>
+                <td><center><b>№</b></center></td>
+                <td><center><b>Собствено име</b></center></td>
+                <td><center><b>Презиме</b></center></td>
+                <td><center><b>Фамилия</b></center></td>
+                <td><center><b>ЕГН</b></center></td>
+                <td><center><b>БАЛ</b></center></td>
+                <td><center></center></td>
+                <td><center></center></td>
+                <td><center></center></td>
+                <td><center></center></td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in students %}
+                <tr>
+                    <td><center>{{ s.entry_number }}</center></td>
+                    <td><center>{{ s.first_name }}</center></td>
+                    <td><center>{{ s.second_name }}</center></td>
+                    <td><center>{{ s.third_name }}</center></td>
+                    <td><center>{{ s.egn }}</center></td>
+                    <td><center>{{ s.grades_evaluated }}</center></td>
+                    <td><center><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/">Още данни</a></center></td>
+                    <td><center><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/edit">Промени</a></center></td>
+                    <td><center><a href="/campaigns/{{ campaign.id }}/students/{{ s.id }}.pdf/">Генерирай формуляр</a></center></td>
+                    <td><center>
+                        <form method="POST" action="/campaigns/{{campaign.id}}/students/{{s.id}}/delete">
+                            {% csrf_token %}
+                            <button type="submit">Изтрий</button>
+                        </form>
+                    </center></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
 {% endblock %}
