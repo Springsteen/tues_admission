@@ -192,7 +192,7 @@ def create_student(request, campaign_id):
                     s = Student.objects.last()
                     student_count = campaign.student_set.count()
                     for i in range(student_count+1):
-                        if get_object_or_none(Student, entry_number = (i+1)) is None:
+                        if get_object_or_none(Student, entry_number = (i+1), campaign = campaign) is None:
                             s.entry_number = (i+1)
                             break
                     s.campaign = campaign
@@ -469,6 +469,9 @@ def delete_hall(request, campaign_id, hall_id):
             hall = get_object_or_none(Hall, campaign_id = campaign_id, id = hall_id)
             campaign = get_object_or_none(Campaign, id = campaign_id)
             if (hall is not None) and (campaign is not None):
+                for s in hall.student_set.all():
+                    s.hall = None
+                    s.save()
                 hall.delete()
                 messages.success(request, "Вие успешно изтрихте залата")
                 return redirect (campaign)
@@ -514,7 +517,8 @@ def populate_halls(request, campaign_id):
             )
             return render(request, 'show_campaign.html', {
                 'campaign': campaign,
-                'students': campaign.student_set.all()
+                'students': campaign.student_set.all(),
+                'halls': campaign.hall_set.all()
             })
     else:
         messages.warning(
@@ -610,13 +614,21 @@ def check_for_capacity(hall_set, students):
     return cap > students
 
 def populate(hall_set, students):
+    for s in students:
+        s.hall = None
+        s.save()
+
     for i,s in enumerate(students):
         hallIndex = i % hall_set.count()
-        while not (hall_set[hallIndex].student_set.count() < hall_set[hallIndex].capacity):
-            if hallIndex < hall_set.count():
-                hallIndex+=1
-            else:
-                return
+
+        if not (hall_set[hallIndex].student_set.count() < hall_set[hallIndex].capacity):
+            hallIndex = 1
+            while not (hall_set[hallIndex].student_set.count() < hall_set[hallIndex].capacity):
+                if hallIndex < hall_set.count():
+                    hallIndex+=1
+                else:
+                    return
+
         s.hall = hall_set[hallIndex]
         s.save()
 
