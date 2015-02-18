@@ -16,7 +16,7 @@
         {% endfor %}
     {% endif %}
 
-    <div class="panel panel-primary">
+    <div class="panel panel-primary" id="create_student_form">
         <form method="POST" action="/campaigns/{{campaign.id}}/students/{{student.id}}/edit" role="form">
             {% csrf_token %}
 

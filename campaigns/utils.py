@@ -19,7 +19,7 @@ def get_populated_student_specialties(campaign, system_programing_count, compute
         student_set,
         key = lambda student: student.grades_evaluated,
         reverse = True
-    )[start_position-1:end_position]
+    )[start_position-1:end_position-1]
     # print("+++++++++++++++++++++++++++")
     # for s in requested_students:
     #     print(s.entry_number, s.grades_evaluated)

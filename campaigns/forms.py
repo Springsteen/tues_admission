@@ -25,7 +25,7 @@ class HallForm(forms.models.ModelForm):
             'name': forms.fields.TextInput(attrs={
                 'class': 'form-control',
             }),
-            'capacity': forms.fields.NumberInput(attrs={
+            'capacity': forms.fields.TextInput(attrs={
                 'class': 'form-control',
             }),
         }
@@ -66,19 +66,19 @@ class StudentForm(forms.models.ModelForm):
             'previous_school': forms.fields.TextInput(attrs={
                 'class': 'form-control student_field',
             }),
-            'bel_school': forms.fields.NumberInput(attrs={
+            'bel_school': forms.fields.TextInput(attrs={
                 'class': 'form-control student_field student_grade_input',
             }),
-            'physics_school': forms.fields.NumberInput(attrs={
+            'physics_school': forms.fields.TextInput(attrs={
                 'class': 'form-control student_field student_grade_input',
             }),
-            'bel_exam': forms.fields.NumberInput(attrs={
+            'bel_exam': forms.fields.TextInput(attrs={
                 'class': 'form-control student_field student_grade_input',
             }),
-            'maths_exam': forms.fields.NumberInput(attrs={
+            'maths_exam': forms.fields.TextInput(attrs={
                 'class': 'form-control student_field student_grade_input',
             }),
-            'maths_tues_exam': forms.fields.NumberInput(attrs={
+            'maths_tues_exam': forms.fields.TextInput(attrs={
                 'class': 'form-control student_field student_grade_input',
             }),
             'first_choice': forms.fields.TextInput(attrs={
@@ -93,7 +93,7 @@ class StudentForm(forms.models.ModelForm):
     # Student personal data validations
     def clean_egn(self):
         egn = self.cleaned_data['egn']
-        if Student.objects.filter(egn = egn).count() > 0:
+        if Student.objects.filter(egn = egn).count() > 0 and not hasattr(self, 'instance'):
             raise forms.ValidationError(
                 'Вече съществува кандидат с ЕГН: %s' % egn
             )

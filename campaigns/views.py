@@ -51,14 +51,14 @@ def logout_user(request):
     messages.success(request, "Вие излязохте успешно!")
     return redirect('/')
 
-@transaction.atomic
+@transaction.autocommit
 def create_campaign(request):
     if request.user.is_authenticated():
         form = CampaignForm(request.POST or None)
         if request.method == "POST":
             if form.is_valid():
                 form.save()
-                campaign = Campaign.objects.last()
+                campaign = Campaign.objects.all().reverse()[:1][0]
                 messages.success(
                     request,
                     "Вие успешно създадохте кампания с име %s" % campaign.title
@@ -79,7 +79,7 @@ def create_campaign(request):
         )
         return redirect('/')
 
-@transaction.atomic
+@transaction.autocommit
 def delete_campaign(request, campaign_id):
     if request.user.is_authenticated():
         if request.method == "POST":
@@ -180,7 +180,7 @@ def list_campaigns(request):
         )
         return redirect('/')
 
-@transaction.atomic
+@transaction.autocommit
 def create_student(request, campaign_id):
     if request.user.is_authenticated():
         form = StudentForm(request.POST or None)
@@ -189,11 +189,14 @@ def create_student(request, campaign_id):
             if request.method == "POST":
                 if form.is_valid():
                     form.save()
-                    s = Student.objects.last()
+                    s = Student.objects.all().reverse()[:1][0]
                     student_count = campaign.student_set.count()
+                    print "before"
+                    for s in Student.objects.all():
+                        print(s.entry_number)
                     for i in range(student_count+1):
                         if get_object_or_none(Student, entry_number = (i+1), campaign = campaign) is None:
-                            s.entry_number = (i+1)
+                            s.entry_number = int(i+1)
                             break
                     s.campaign = campaign
                     s.grades_evaluated = (
@@ -201,6 +204,9 @@ def create_student(request, campaign_id):
                         s.maths_exam + (4 * s.maths_tues_exam)
                     )
                     s.save()
+                    print "after"
+                    for s in Student.objects.all():
+                        print(s.entry_number)
                     messages.success(request, "Ученикът беше успешно записан.")
                     return redirect(campaign)
                 else:
@@ -220,7 +226,7 @@ def create_student(request, campaign_id):
         )
         return redirect('/')
 
-@transaction.atomic
+@transaction.autocommit
 def edit_student(request, campaign_id, student_id):
     if request.user.is_authenticated():
         student = get_object_or_none(Student, id = student_id)
@@ -266,7 +272,7 @@ def edit_student(request, campaign_id, student_id):
         )
         return redirect('/')
 
-@transaction.atomic
+@transaction.autocommit
 def delete_student(request, campaign_id, student_id):
     if request.user.is_authenticated():
         if request.method == "POST":
@@ -328,18 +334,18 @@ def student_as_pdf(request, campaign_id, student_id):
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = ('attachment; filename="%s.pdf"' % student_id)
         enc = 'UTF-8'
-        pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf',enc))
-        pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf',enc))
+        pdfmetrics.registerFont(TTFont('Arial', 'Arial.ttf',enc))
+        pdfmetrics.registerFont(TTFont('Arial-Bold', 'Arial-Bold.ttf',enc))
 
         p = canvas.Canvas(response)
-        p.setFont('DejaVuSans', 12)
+        p.setFont('Arial', 12)
         p.drawString(30, 820, 'Входящ номер %d' % student.entry_number)
         p.drawString(425, 820, 'До Ректора на')
         p.drawString(425, 805, 'Технически Университет')
         p.drawString(425, 790, 'гр. София')
-        p.setFont('DejaVuSans', 20)
+        p.setFont('Arial', 20)
         p.drawString(225, 760, 'Заявление')
-        p.setFont('DejaVuSans', 10)
+        p.setFont('Arial', 10)
         p.drawString(30, 745, 'от %s %s %s' % (student.first_name, student.second_name, student.third_name))
         p.drawString(
             30, 730, 'ученик/чка от VII клас за учебната %s/%s г. на училище: %s' %
@@ -363,20 +369,20 @@ def student_as_pdf(request, campaign_id, student_id):
         p.drawString(390, 465, 'Подпис(на ученика или родителя):')
         p.drawString(390, 435, '................................')
         p.line(0,415,600,415)
-        p.setFont('DejaVuSans', 15)
+        p.setFont('Arial', 15)
         p.drawString(120, 395, 'Технологично училище "Електронни системи"')
         p.drawString(140, 380 , 'към Технически Университет гр. София')
-        p.setFont('DejaVuSans', 10)
+        p.setFont('Arial', 10)
         p.line(60,350,200,350)
         p.line(60,150,200,150)
         p.line(60,350,60,150)
         p.line(200,350,200,150)
-        p.setFont('DejaVuSans', 15)
+        p.setFont('Arial', 15)
         p.drawString(300, 320 , 'Входящ Nº: %s' % student.entry_number)
         p.drawString(300, 290 , 'Име: %s' % student.first_name)
         p.drawString(300, 260 , 'Презиме: %s' % student.second_name)
         p.drawString(300, 230 , 'Фамилия: %s' % student.third_name)
-        p.setFont('DejaVuSans', 10)
+        p.setFont('Arial', 10)
         p.drawString(60, 120 , 'Настоящият талон служи за вход в залата за изпита')
         p.drawString(60, 105 , 'Задължително го носете! В противен случай ученикът няма да бъде допуснат до изпита')
         p.drawString(390, 80, 'Приел документите:')
@@ -388,7 +394,7 @@ def student_as_pdf(request, campaign_id, student_id):
     else:
         return redirect('/')
 
-@transaction.atomic
+@transaction.autocommit
 def create_hall(request, campaign_id):
     if request.user.is_authenticated():
         campaign = get_object_or_none(Campaign, id = campaign_id)
@@ -400,7 +406,7 @@ def create_hall(request, campaign_id):
         if request.method == 'POST':
             if form.is_valid():
                 form.save()
-                hall = Hall.objects.last()
+                hall = Hall.objects.all().reverse()[:1][0]
                 hall.campaign_id = campaign.id
                 hall.save()
                 messages.success(request, "Вие успешно създадохте залата")
@@ -435,7 +441,7 @@ def show_hall(request, campaign_id, hall_id):
         )
         return redirect('/')
 
-@transaction.atomic
+@transaction.autocommit
 def edit_hall(request, campaign_id, hall_id):
     if request.user.is_authenticated():
         hall = get_object_or_none(Hall, campaign_id = campaign_id, id = hall_id)
@@ -462,7 +468,7 @@ def edit_hall(request, campaign_id, hall_id):
         )
         return redirect('/')
 
-@transaction.atomic
+@transaction.autocommit
 def delete_hall(request, campaign_id, hall_id):
     if request.user.is_authenticated():
         if request.method == "POST":
@@ -489,7 +495,7 @@ def delete_hall(request, campaign_id, hall_id):
         )
         return redirect('/')
 
-@transaction.atomic
+@transaction.autocommit
 def populate_halls(request, campaign_id):
     if request.user.is_authenticated():
         campaign = get_object_or_none(Campaign, id = campaign_id)
@@ -506,10 +512,21 @@ def populate_halls(request, campaign_id):
                 campaign.hall_set.all(),
                 campaign.student_set.all()
             )
-            return render(request, 'populate_halls.html', {
-                'students' : campaign.student_set.all(),
-                'campaign_id' : campaign_id
-            })
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="database.csv"'
+            writer = csv.writer(response)
+            writer.writerow([
+                'Входящ номер', 'Име',
+                'Презиме', 'Фамилия', 'Име на залата',
+            ])
+
+            students = Student.objects.all()
+            for student in students:
+                writer.writerow([
+                    student.entry_number, student.first_name,
+                    student.second_name, student.third_name, student.hall.name
+                ])
+            return response
         else:
             messages.warning(
                 request,
@@ -536,9 +553,8 @@ def export_as_csv(request, campaign_id):
         campaign = Campaign.objects.get(id = campaign_id)
         students = campaign.student_set.all()
 
-        #Student objects are not itterable so im writing the file this way
         writer.writerow([
-            'Входящ номер', 'Име',
+            ('Входящ номер'), 'Име',
             'Презиме', 'Фамилия',
             'Адрес', 'Имена на родител',
             'Училище', 'БЕЛ-Училище',
