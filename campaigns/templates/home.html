@@ -5,7 +5,7 @@
 {% block home %}
     {% if not user.is_authenticated %}
         <div class="login_form">
-            <form method="post" action="/" role="form">
+            <form id="app-login" method="post" action="/" role="form">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="username">Име</label>
@@ -16,6 +16,15 @@
                     <input type="password" name="password" id="id_password" class="form-control input-lg"/>
                 </div>
                 <input type="submit" value="Вход" class="btn btn-primary" id="id_login_submit_button"/>
+            </form>
+
+            <form id="google-login" method="get" action="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}" role="form">
+                <button
+                    type="submit"
+                    class="btn"
+                >
+                    Влез с Google
+                </button>
             </form>
         </div>
     {% endif %}

@@ -76,3 +76,18 @@ ul.nav:first-child {
 #create_campaign_form {
 	padding: 1em;
 }
+
+#app-login > .btn {
+	margin-left: 35%;
+	margin-right: 35%;
+}
+
+#google-login {
+	padding: 20px;
+	margin: 20px;
+}
+
+#google-login > .btn {
+	background-color: #F79F81;
+	border-color: none;
+}
