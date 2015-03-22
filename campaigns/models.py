@@ -6,6 +6,8 @@ class Campaign(models.Model):
     title = models.CharField(max_length=40, default='')
     description = models.TextField(max_length=500, default='')
 
+    is_completed = models.BooleanField(default=False)
+
     def get_absolute_url(self):
         return reverse('show_campaign', args=[self.id])
 

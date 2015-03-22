@@ -29,6 +29,8 @@ import csv
 
 def home(request):
     if request.method == 'GET':
+        if request.user.is_authenticated():
+            return redirect('/campaigns')
         return render(request, 'home.html')
     else:
         username = request.POST['username']
@@ -133,6 +135,42 @@ def show_campaign(request, campaign_id):
         )
         return redirect('/')
 
+@transaction.autocommit
+def finish_campaign(request, campaign_id):
+    campaign = get_object_or_none(Campaign, id = campaign_id)
+    if campaign:
+        campaign.is_completed = True
+        campaign.save()
+        messages.warning(
+            request,
+            "Вие успешно приключихте кампанията"
+        )
+        return redirect('/campaigns')
+    else:
+        messages.warning(
+            request,
+            "Такава кампания няма!"
+        )
+        return redirect('/')
+
+@transaction.autocommit
+def activate_campaign(request, campaign_id):
+    campaign = get_object_or_none(Campaign, id = campaign_id)
+    if campaign:
+        campaign.is_completed = False
+        campaign.save()
+        messages.warning(
+            request,
+            "Вие успешно активирахте кампанията"
+        )
+        return redirect('/campaigns')
+    else:
+        messages.warning(
+            request,
+            "Такава кампания няма!"
+        )
+        return redirect('/')
+
 def search_campaign(request, campaign_id):
     response = {}
 
@@ -171,7 +209,7 @@ def search_campaign(request, campaign_id):
 
 def list_campaigns(request):
     if request.user.is_authenticated():
-        campaigns = Campaign.objects.all()
+        campaigns = Campaign.objects.filter(is_completed=False)
         return render(request, 'list_campaigns.html', {'campaigns': campaigns})
     else:
         messages.warning(
@@ -179,6 +217,18 @@ def list_campaigns(request):
             "Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
         )
         return redirect('/')
+
+def finished_campaigns(request):
+    if request.user.is_authenticated():
+        campaigns = Campaign.objects.filter(is_completed=True)
+        return render(request, 'list_campaigns.html', {'campaigns': campaigns})
+    else:
+        messages.warning(
+            request,
+            "Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
+        )
+        return redirect('/')
+
 
 @transaction.autocommit
 def create_student(request, campaign_id):

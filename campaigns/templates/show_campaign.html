@@ -1,11 +1,14 @@
 {% extends 'base.html' %}
 
 {% block title %}Кампания{% endblock %}
+
+{% block activate_campaign %}<li class="active"><a href="/campaigns/{{ campaign.id }}/activate">Активирай</a></li>{% endblock %}
 {% block new_student_link %}<li class="active"><a href="/campaigns/{{ campaign.id }}/students/new">Нов Ученик</a></li>{% endblock %}
 {% block export_as_csv %}<li class="active"><a href="/campaigns/{{ campaign.id }}.csv/">Генерирай CSV</a></li>{% endblock %}
 {% block create_hall_link %}<li class="active"><a href="/campaigns/{{ campaign.id }}/halls/new">Нова зала</a></li>{% endblock %}
 {% block populate_halls_link %}<li class="active"><a href="/campaigns/{{ campaign.id }}/halls">Разпредели по зали</a></li>{% endblock %}
 {% block populate_student_specialties_link %}<li class="active"><a href="/campaigns/{{ campaign.id }}/specialties">Класиране</a></li>{% endblock %}
+{% block finish_campaign %}<li class="active"><a href="/campaigns/{{ campaign.id }}/finish">Приключи</a></li>{% endblock %}
 
 {% block show_campaign %}
 
@@ -71,9 +74,11 @@
                 <td><center><b>ЕГН</b></center></td>
                 <td><center><b>БАЛ</b></center></td>
                 <td><center></center></td>
-                <td><center></center></td>
-                <td><center></center></td>
-                <td><center></center></td>
+                {% if not campaign.is_completed %}
+                    <td><center></center></td>
+                    <td><center></center></td>
+                    <td><center></center></td>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -86,14 +91,18 @@
                     <td><center>{{ s.egn }}</center></td>
                     <td><center>{{ s.grades_evaluated }}</center></td>
                     <td><center><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/">Още данни</a></center></td>
-                    <td><center><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/edit">Промени</a></center></td>
-                    <td><center><a href="/campaigns/{{ campaign.id }}/students/{{ s.id }}.pdf/">Генерирай формуляр</a></center></td>
-                    <td><center>
-                        <form method="POST" action="/campaigns/{{campaign.id}}/students/{{s.id}}/delete">
-                            {% csrf_token %}
-                            <button type="submit">Изтрий</button>
-                        </form>
-                    </center></td>
+                    {% if not campaign.is_completed %}
+                        <td><center><a href="/campaigns/{{campaign.id}}/students/{{s.id}}/edit">Промени</a></center></td>
+                        <td><center><a href="/campaigns/{{ campaign.id }}/students/{{ s.id }}.pdf/">Генерирай формуляр</a></center></td>
+                        <td>
+                            <center>
+                            <form method="POST" action="/campaigns/{{campaign.id}}/students/{{s.id}}/delete">
+                                {% csrf_token %}
+                                <button type="submit">Изтрий</button>
+                            </form>
+                            </center>
+                        </td>
+                    {% endif %}
                 </tr>
             {% endfor %}
         </tbody>

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %} Списък с кампании {% endblock %}
+{% block finished_campaigns %}<li class="active"><a href="/campaigns/finished">Неактивни кампании</a></li>{% endblock %}
 
 {% block list_campaigns %}
     <table class="table table-hover table-bordered">

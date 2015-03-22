@@ -13,6 +13,7 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(default='', max_length=40)),
             ('description', self.gf('django.db.models.fields.TextField')(default='', max_length=500)),
+            ('is_completed', self.gf('django.db.models.fields.BooleanField')(default=False)),
         ))
         db.send_create_signal(u'campaigns', ['Campaign'])
 
@@ -67,6 +68,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Campaign'},
             'description': ('django.db.models.fields.TextField', [], {'default': "''", 'max_length': '500'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_completed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'title': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '40'})
         },
         u'campaigns.hall': {

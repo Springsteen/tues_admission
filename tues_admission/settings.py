@@ -44,8 +44,8 @@ if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine'):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'HOST': '/cloudsql/tues-admission-752:admission-sql-db',
-            'NAME': 'admission_sql_db',
+            'HOST': '/cloudsql/tues-admission-752:admission-sql',
+            'NAME': 'admission_sql',
             'USER': 'root',
         }
     }
@@ -56,8 +56,8 @@ elif os.getenv('SETTINGS_MODE') == 'prod':
     DATABASES = {
         'default': {
             'ENGINE': 'google.appengine.ext.django.backends.rdbms',
-            'INSTANCE': 'tues-admission-752:admission-sql-db',
-            'NAME': 'admission_sql_db',
+            'INSTANCE': 'tues-admission-752:admission-sql',
+            'NAME': 'admission_sql',
             'USER': 'root',
         }
     }
@@ -105,10 +105,10 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'VJFNRyKyqLlmNQq64TYEK_xa'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'http://tues-admission-752.appspot.com/campaigns'
 
 #get all user mails and put them into google oauth2 whitelist so they can log with google acc
-from django.contrib.auth.models import User
-whitelist = [x for x in User.objects.filter(is_staff=True).values_list('email', flat=True) if x]
+# from django.contrib.auth.models import User
+# whitelist = [x for x in User.objects.filter(is_staff=True).values_list('email', flat=True) if x]
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_EMAILS = whitelist
+# SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_EMAILS = whitelist
 
 SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.social_details',

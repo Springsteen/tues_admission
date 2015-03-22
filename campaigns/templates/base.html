@@ -15,14 +15,20 @@
             {% if user.is_authenticated %}
                 <ul class="nav navbar-nav">
                     <li class="active"><a href="/campaigns/new">Нова кампания</a></li>
-                    <li class="active"><a href="/campaigns">Всички кампании</a></li>
-                    {% block new_student_link %}{% endblock %}
-                    {% block to_the_campaign %}{% endblock %}
-                    {% block generate_pdf %}{% endblock %}
-                    {% block export_as_csv %}{% endblock %}
-                    {% block populate_halls_link %}{% endblock %}
-                    {% block create_hall_link %}{% endblock %}
-                    {% block populate_student_specialties_link %}{% endblock %}
+                    <li class="active"><a href="/campaigns">Активни кампании</a></li>
+                    {% if not campaign.is_completed %}
+                        {% block finished_campaigns %}{% endblock %}
+                        {% block new_student_link %}{% endblock %}
+                        {% block to_the_campaign %}{% endblock %}
+                        {% block generate_pdf %}{% endblock %}
+                        {% block export_as_csv %}{% endblock %}
+                        {% block populate_halls_link %}{% endblock %}
+                        {% block create_hall_link %}{% endblock %}
+                        {% block populate_student_specialties_link %}{% endblock %}
+                        {% block finish_campaign %}{%endblock%}
+                    {% else %}
+                        <li class="active"><a href="/campaigns/{{ campaign.id }}/activate">Активирай</a></li>
+                    {% endif %}
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right" id="logout_button">
