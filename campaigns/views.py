@@ -596,6 +596,22 @@ def populate_halls(request, campaign_id):
         )
         return redirect('/')
 
+
+def export_hall(request, campaign_id, hall_id):
+    fallback = reverse('home')
+    if request.user.is_authenticated():
+        hall = get_object_or_none(Hall, campaign_id=campaign_id, id=hall_id)
+        if hall:
+            return hall.export_students()
+        return redirect(fallback)
+    else:
+        messages.warning(
+            request,
+            "Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
+        )
+        return redirect(fallback)
+
+
 def export_as_csv(request, campaign_id):
     if request.user.is_authenticated():
         response = HttpResponse(content_type='text/csv')

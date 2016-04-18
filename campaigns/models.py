@@ -1,4 +1,8 @@
+# -*- coding: utf-8 -*-
+import csv
+
 from django.db import models
+from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 
 
@@ -17,6 +21,24 @@ class Hall(models.Model):
     campaign = models.ForeignKey(Campaign, default=Campaign.DEFAULT_PK)
     name = models.CharField(max_length=10, default='')
     capacity = models.IntegerField(default=0)
+
+    def export_students(self):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="{hall}.csv"'.format(hall=self.name)
+        writer = csv.writer(response)
+        writer.writerow([
+            u'Входящ номер', u'Име',
+            u'Презиме', u'Фамилия'
+        ])
+
+        students = self.student_set.all()
+        for student in students:
+            writer.writerow([
+                student.entry_number, student.first_name,
+                student.second_name, student.third_name
+            ])
+        return response
+
 
 class Student(models.Model):
     campaign = models.ForeignKey(Campaign, default=Campaign.DEFAULT_PK)

@@ -45,6 +45,7 @@
                 <td><center><b>Капацитет на залата</b></center></td>
                 <td></td>
                 <td></td>
+                <td></td>
             </tr>
         </thead>
         <tbody>
@@ -53,6 +54,7 @@
                     <td><center>{{ h.name }}</center></td>
                     <td><center>{{ h.capacity }}</center></td>
                     <td><center><a href="/campaigns/{{campaign.id}}/halls/{{h.id}}/edit">Промени</a></center></td>
+                    <td><center><a href="/campaigns/{{campaign.id}}/halls/{{h.id}}/export">Експортирай</a></center></td>
                     <td><center>
                         <form method="POST" action="/campaigns/{{campaign.id}}/halls/{{h.id}}/delete">
                             {% csrf_token %}
