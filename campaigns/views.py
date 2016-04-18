@@ -186,7 +186,7 @@ def search_campaign(request, campaign_id):
 
     if result_set.count() == 0:
         result_set = campaign.student_set.all().filter(
-            egn = request.GET['egn']
+            id = request.GET['entry_number']
         )
 
     if result_set.count() > 0:

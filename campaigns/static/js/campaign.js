@@ -28,13 +28,13 @@ $(document).ready(function (){
 
 		var $searchPanel = $("#campaign_search");
 		var $firstName = $("#search_first_name");
-		var $egn = $("#search_egn");
+		var $entryNumber = $("#search_entry_number");
 
-		console.log("egn => ", $egn.val(), "first_name => ", $firstName.val());
+		console.log("entry_number => ", $entryNumber.val(), "first_name => ", $firstName.val());
 
 		$.getJSON(
 			searchUrl,
-			{"first_name" : $firstName.val(), "egn" : $egn.val()},
+			{"first_name" : $firstName.val(), "entry_number" : $entryNumber.val()},
 			function(response){
 				var searchExists = document.getElementById("search_result");
 				if (searchExists == null){
@@ -81,7 +81,7 @@ $(document).ready(function (){
 		);
 
 		$firstName.val("");
-		$egn.val("");
+		$entryNumber.val("");
 	});
 
 	$(document).on("click", "#clear_search_campaign_button", function(){
