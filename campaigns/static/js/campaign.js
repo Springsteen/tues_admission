@@ -89,4 +89,9 @@ $(document).ready(function (){
 		document.getElementById("search_campaign_button").disabled = false;
 	});
 
+	$(document).on('click', '.delete-student', function (e) {
+		var answer = confirm('Сигурни ли сте, че искате да изтриете този кандидат?');
+		if (!answer) e.preventDefault();
+	})
+
 });
