@@ -41,3 +41,8 @@ class Student(models.Model):
 
     def get_full_name(self):
         return self.first_name + " " + self.second_name + " " + self.third_name
+
+    def get_next_student(self):
+        if Student.objects.filter(pk=(self.pk + 1)).exists():
+            return reverse('edit_student', args=[self.campaign.pk, self.pk + 1])
+        return False

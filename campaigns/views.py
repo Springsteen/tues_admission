@@ -299,6 +299,8 @@ def edit_student(request, campaign_id, student_id):
                         )
                         student.save()
                         messages.success(request, "Вие успешно редактирахте данните на ученика.")
+                        if request.POST['next'] == 'true':
+                            return redirect(student.get_next_student() or campaign)
                         return redirect(campaign)
                     else:
                         messages.warning(request, "Ученикът не може да бъде достъпен")

@@ -116,4 +116,8 @@ $(document).ready(function(){
 		);
 	};
 
+	$('#edit_student_next').on('click', function (e) {
+		$('#create_student_form').find('[name="next"]').val('true');
+	});
+
 });
