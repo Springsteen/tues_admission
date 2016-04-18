@@ -681,19 +681,18 @@ def check_for_capacity(hall_set, students):
         cap += h.capacity
     return cap > students
 
-def populate(hall_set, students):
-    for s in students:
-        s.hall = None
-        s.save()
 
-    for i,s in enumerate(students):
-        hallIndex = i % hall_set.count()
+def populate(hall_set, students):
+    halls = hall_set.count()
+    for i, s in enumerate(students):
+        print(i, s)
+        hallIndex = i % halls
 
         if not (hall_set[hallIndex].student_set.count() < hall_set[hallIndex].capacity):
             hallIndex = 1
             while not (hall_set[hallIndex].student_set.count() < hall_set[hallIndex].capacity):
-                if hallIndex < hall_set.count():
-                    hallIndex+=1
+                if hallIndex < halls:
+                    hallIndex += 1
                 else:
                     return
 
