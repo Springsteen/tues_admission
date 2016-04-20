@@ -564,21 +564,11 @@ def populate_halls(request, campaign_id):
                 campaign.hall_set.all(),
                 campaign.student_set.all()
             )
-            response = HttpResponse(content_type='text/csv')
-            response['Content-Disposition'] = 'attachment; filename="database.csv"'
-            writer = csv.writer(response)
-            writer.writerow([
-                'Входящ номер', 'Име',
-                'Презиме', 'Фамилия', 'Име на залата',
-            ])
-
-            students = Student.objects.all()
-            for student in students:
-                writer.writerow([
-                    student.entry_number, student.first_name,
-                    student.second_name, student.third_name, student.hall.name
-                ])
-            return response
+            messages.warning(
+                request,
+                'Учениците бяха успешно разпределени по зали'
+            )
+            return redirect(campaign)
         else:
             messages.warning(
                 request,
