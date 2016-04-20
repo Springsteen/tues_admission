@@ -26,6 +26,7 @@ import json
 
 import csv
 
+
 def home(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
@@ -47,10 +48,12 @@ def home(request):
             messages.warning(request, "Такъв потребител не съществува!")
             return redirect('/')
 
+
 def logout_user(request):
     logout(request)
     messages.success(request, "Вие излязохте успешно!")
     return redirect('/')
+
 
 @transaction.autocommit
 def create_campaign(request):
@@ -80,11 +83,12 @@ def create_campaign(request):
         )
         return redirect('/')
 
+
 @transaction.autocommit
 def delete_campaign(request, campaign_id):
     if request.user.is_authenticated():
         if request.method == "POST":
-            campaign = get_object_or_none(Campaign, id = campaign_id)
+            campaign = get_object_or_none(Campaign, id=campaign_id)
             if campaign is not None:
                 campaign.student_set.all().delete()
                 campaign.hall_set.all().delete()
@@ -112,7 +116,7 @@ def delete_campaign(request, campaign_id):
 
 def show_campaign(request, campaign_id):
     if request.user.is_authenticated():
-        campaign = get_object_or_none(Campaign, id = campaign_id)
+        campaign = get_object_or_none(Campaign, id=campaign_id)
         if campaign is not None:
             students = campaign.student_set.order_by("-entry_number").all()
             halls = campaign.hall_set.all()
@@ -134,9 +138,10 @@ def show_campaign(request, campaign_id):
         )
         return redirect('/')
 
+
 @transaction.autocommit
 def finish_campaign(request, campaign_id):
-    campaign = get_object_or_none(Campaign, id = campaign_id)
+    campaign = get_object_or_none(Campaign, id=campaign_id)
     if campaign:
         campaign.is_completed = True
         campaign.save()
@@ -152,9 +157,10 @@ def finish_campaign(request, campaign_id):
         )
         return redirect('/')
 
+
 @transaction.autocommit
 def activate_campaign(request, campaign_id):
-    campaign = get_object_or_none(Campaign, id = campaign_id)
+    campaign = get_object_or_none(Campaign, id=campaign_id)
     if campaign:
         campaign.is_completed = False
         campaign.save()
@@ -170,22 +176,23 @@ def activate_campaign(request, campaign_id):
         )
         return redirect('/')
 
+
 def search_campaign(request, campaign_id):
     response = {}
 
-    campaign = get_object_or_none(Campaign, id = campaign_id)
+    campaign = get_object_or_none(Campaign, id=campaign_id)
     if campaign is None:
         response['status_code'] = '404'
         response['status_message'] = 'Campaign not found'
         return HttpResponse(json.dumps(response), content_type="application/json")
 
     result_set = campaign.student_set.all().filter(
-        first_name = request.GET['first_name']
+        first_name=request.GET['first_name']
     )
 
     if result_set.count() == 0:
         result_set = campaign.student_set.all().filter(
-            id = request.GET['entry_number']
+            id=request.GET['entry_number']
         )
 
     if result_set.count() > 0:
@@ -206,6 +213,7 @@ def search_campaign(request, campaign_id):
 
     return HttpResponse(json.dumps(response), content_type="application/json")
 
+
 def list_campaigns(request):
     if request.user.is_authenticated():
         campaigns = Campaign.objects.filter(is_completed=False)
@@ -216,6 +224,7 @@ def list_campaigns(request):
             "Съдържанието на тази страница не е достъпно за вас поради това, че не сте влязъл в потребителския си акаунт"
         )
         return redirect('/')
+
 
 def finished_campaigns(request):
     if request.user.is_authenticated():
@@ -233,7 +242,7 @@ def finished_campaigns(request):
 def create_student(request, campaign_id):
     if request.user.is_authenticated():
         form = StudentForm(request.POST or None)
-        campaign = get_object_or_none(Campaign, id = campaign_id)
+        campaign = get_object_or_none(Campaign, id=campaign_id)
         if campaign is not None:
             if request.method == "POST":
                 if form.is_valid():
@@ -244,7 +253,7 @@ def create_student(request, campaign_id):
                     for s in Student.objects.all():
                         print(s.entry_number)
                     for i in range(student_count+1):
-                        if get_object_or_none(Student, entry_number = (i+1), campaign = campaign) is None:
+                        if get_object_or_none(Student, entry_number=(i+1), campaign=campaign) is None:
                             s.entry_number = int(i+1)
                             break
                     s.campaign = campaign
@@ -275,13 +284,14 @@ def create_student(request, campaign_id):
         )
         return redirect('/')
 
+
 @transaction.autocommit
 def edit_student(request, campaign_id, student_id):
     if request.user.is_authenticated():
-        student = get_object_or_none(Student, id = student_id)
-        campaign = get_object_or_none(Campaign, id = campaign_id)
+        student = get_object_or_none(Student, id=student_id)
+        campaign = get_object_or_none(Campaign, id=campaign_id)
         if (student is not None) and (campaign is not None):
-            form = StudentForm(request.POST or None, instance = student)
+            form = StudentForm(request.POST or None, instance=student)
             if request.method == 'GET':
                 return render(
                     request, 'edit_student.html',
@@ -290,7 +300,7 @@ def edit_student(request, campaign_id, student_id):
             else:
                 if form.is_valid():
                     form.save()
-                    student = get_object_or_none(Student, id = student_id)
+                    student = get_object_or_none(Student, id=student_id)
                     if student is not None:
                         student.grades_evaluated = (
                             student.bel_school + student.physics_school + student.bel_exam +
@@ -323,11 +333,12 @@ def edit_student(request, campaign_id, student_id):
         )
         return redirect('/')
 
+
 @transaction.autocommit
 def delete_student(request, campaign_id, student_id):
     if request.user.is_authenticated():
         if request.method == "POST":
-            student = get_object_or_none(Student, campaign_id = campaign_id, id = student_id)
+            student = get_object_or_none(Student, campaign_id=campaign_id, id=student_id)
             if student is not None:
                 student.delete()
                 messages.success(
@@ -353,8 +364,8 @@ def delete_student(request, campaign_id, student_id):
 
 def show_student(request, campaign_id, student_id):
     if request.user.is_authenticated():
-        campaign = get_object_or_none(Campaign, id = campaign_id)
-        student = get_object_or_none(Student, id = student_id)
+        campaign = get_object_or_none(Campaign, id=campaign_id)
+        student = get_object_or_none(Student, id=student_id)
         if (campaign is not None) and (student is not None):
             return render(request, 'show_student.html', {'campaign': campaign, 'student': student})
         else:
@@ -372,10 +383,11 @@ def show_student(request, campaign_id, student_id):
         )
         return redirect('/')
 
+
 def student_as_pdf(request, campaign_id, student_id):
     if request.user.is_authenticated():
-        student = get_object_or_none(Student, id = student_id)
-        campaign = get_object_or_none(Campaign, id = campaign_id)
+        student = get_object_or_none(Student, id=student_id)
+        campaign = get_object_or_none(Campaign, id=campaign_id)
         if (student is None) or (campaign is None):
             if campaign is not None:
                 return redirect(campaign)
@@ -385,8 +397,8 @@ def student_as_pdf(request, campaign_id, student_id):
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = ('attachment; filename="%s.pdf"' % student_id)
         enc = 'UTF-8'
-        pdfmetrics.registerFont(TTFont('Arial', 'Arial.ttf',enc))
-        pdfmetrics.registerFont(TTFont('Arial-Bold', 'Arial-Bold.ttf',enc))
+        pdfmetrics.registerFont(TTFont('Arial', 'Arial.ttf', enc))
+        pdfmetrics.registerFont(TTFont('Arial-Bold', 'Arial-Bold.ttf', enc))
 
         p = canvas.Canvas(response)
         p.setFont('Arial', 12)
@@ -419,23 +431,23 @@ def student_as_pdf(request, campaign_id, student_id):
         p.drawString(30, 440, 'гр. София, %s/%s/%s' % (d.day, d.month, d.year))
         p.drawString(390, 465, 'Подпис(на ученика или родителя):')
         p.drawString(390, 435, '................................')
-        p.line(0,415,600,415)
+        p.line(0, 415, 600, 415)
         p.setFont('Arial', 15)
         p.drawString(120, 380, 'Технологично училище "Електронни системи"')
-        p.drawString(140, 365 , 'към Технически Университет гр. София')
+        p.drawString(140, 365, 'към Технически Университет гр. София')
         p.setFont('Arial', 10)
-        p.line(60,350,200,350)
-        p.line(60,150,200,150)
-        p.line(60,350,60,150)
-        p.line(200,350,200,150)
+        p.line(60, 350, 200, 350)
+        p.line(60, 150, 200, 150)
+        p.line(60, 350, 60, 150)
+        p.line(200, 350, 200, 150)
         p.setFont('Arial', 15)
-        p.drawString(300, 320 , 'Входящ Nº: %s' % student.entry_number)
-        p.drawString(300, 290 , 'Име: %s' % student.first_name)
-        p.drawString(300, 260 , 'Презиме: %s' % student.second_name)
-        p.drawString(300, 230 , 'Фамилия: %s' % student.third_name)
+        p.drawString(300, 320, 'Входящ Nº: %s' % student.entry_number)
+        p.drawString(300, 290, 'Име: %s' % student.first_name)
+        p.drawString(300, 260, 'Презиме: %s' % student.second_name)
+        p.drawString(300, 230, 'Фамилия: %s' % student.third_name)
         p.setFont('Arial', 10)
-        p.drawString(60, 120 , 'Настоящият талон служи за вход в залата за изпита')
-        p.drawString(60, 105 , 'Задължително го носете! В противен случай ученикът няма да бъде допуснат до изпита')
+        p.drawString(60, 120, 'Настоящият талон служи за вход в залата за изпита')
+        p.drawString(60, 105, 'Задължително го носете! В противен случай ученикът няма да бъде допуснат до изпита')
         p.drawString(390, 80, 'Приел документите:')
         p.drawString(390, 50, '................................')
 
@@ -445,10 +457,11 @@ def student_as_pdf(request, campaign_id, student_id):
     else:
         return redirect('/')
 
+
 @transaction.autocommit
 def create_hall(request, campaign_id):
     if request.user.is_authenticated():
-        campaign = get_object_or_none(Campaign, id = campaign_id)
+        campaign = get_object_or_none(Campaign, id=campaign_id)
         if campaign is None:
             messages.warning(request, "Кампанията към която се оптивате да създадете зала не съществува")
             return redirect('/')
@@ -474,10 +487,11 @@ def create_hall(request, campaign_id):
         )
         return redirect('/')
 
+
 def show_hall(request, campaign_id, hall_id):
     if request.user.is_authenticated():
-        hall = get_object_or_none(Hall, campaign_id = campaign_id, id = hall_id)
-        campaign = get_object_or_none(Campaign, id = campaign_id)
+        hall = get_object_or_none(Hall, campaign_id=campaign_id, id=hall_id)
+        campaign = get_object_or_none(Campaign, id=campaign_id)
         if hall is not None:
             return render(request, 'show_hall.html', {'campaign': campaign, 'hall': hall})
         else:
@@ -492,16 +506,17 @@ def show_hall(request, campaign_id, hall_id):
         )
         return redirect('/')
 
+
 @transaction.autocommit
 def edit_hall(request, campaign_id, hall_id):
     if request.user.is_authenticated():
-        hall = get_object_or_none(Hall, campaign_id = campaign_id, id = hall_id)
-        campaign = get_object_or_none(Campaign, id = campaign_id)
+        hall = get_object_or_none(Hall, campaign_id=campaign_id, id=hall_id)
+        campaign = get_object_or_none(Campaign, id=campaign_id)
         if (hall is None) or (campaign is None):
             messages.warning(request, "Опитвате да изтриете несъществуваща зала")
             return redirect('/')
 
-        form = HallForm(request.POST or None, instance = hall)
+        form = HallForm(request.POST or None, instance=hall)
         if request.method == "POST":
             if form.is_valid():
                 form.save()
@@ -519,19 +534,20 @@ def edit_hall(request, campaign_id, hall_id):
         )
         return redirect('/')
 
+
 @transaction.autocommit
 def delete_hall(request, campaign_id, hall_id):
     if request.user.is_authenticated():
         if request.method == "POST":
-            hall = get_object_or_none(Hall, campaign_id = campaign_id, id = hall_id)
-            campaign = get_object_or_none(Campaign, id = campaign_id)
+            hall = get_object_or_none(Hall, campaign_id=campaign_id, id=hall_id)
+            campaign = get_object_or_none(Campaign, id=campaign_id)
             if (hall is not None) and (campaign is not None):
                 for s in hall.student_set.all():
                     s.hall = None
                     s.save()
                 hall.delete()
                 messages.success(request, "Вие успешно изтрихте залата")
-                return redirect (campaign)
+                return redirect(campaign)
             else:
                 messages.warning(request, "Опитахте се да изтриете несъществуваща зала")
                 if campaign is not None:
@@ -546,10 +562,11 @@ def delete_hall(request, campaign_id, hall_id):
         )
         return redirect('/')
 
+
 @transaction.autocommit
 def populate_halls(request, campaign_id):
     if request.user.is_authenticated():
-        campaign = get_object_or_none(Campaign, id = campaign_id)
+        campaign = get_object_or_none(Campaign, id=campaign_id)
         if campaign is None:
             messages.warning(request, "Кампанията не съществува")
             redirect('/campaigns')
@@ -607,7 +624,7 @@ def export_as_csv(request, campaign_id):
         response['Content-Disposition'] = 'attachment; filename="database.csv"'
         writer = csv.writer(response)
 
-        campaign = Campaign.objects.get(id = campaign_id)
+        campaign = Campaign.objects.get(id=campaign_id)
         students = campaign.student_set.all()
 
         writer.writerow([
@@ -644,7 +661,7 @@ def export_as_csv(request, campaign_id):
 
 def populate_student_specialties(request, campaign_id):
     if request.user.is_authenticated():
-        campaign = get_object_or_none(Campaign, id = campaign_id)
+        campaign = get_object_or_none(Campaign, id=campaign_id)
         if campaign is None:
             messages.warning(request, "Кампанията не съществува")
             return redirect('/campaigns')
@@ -680,6 +697,7 @@ def populate_student_specialties(request, campaign_id):
         )
         return redirect('/')
 
+
 def check_for_capacity(hall_set, students):
     cap = 0
     for h in hall_set:
@@ -703,6 +721,7 @@ def populate(hall_set, students):
 
         s.hall = hall_set[hallIndex]
         s.save()
+
 
 def get_object_or_none(model, **kwargs):
     try:
