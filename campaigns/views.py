@@ -6,7 +6,6 @@ sys.setdefaultencoding('utf8')
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpResponse
 from django.db import transaction
 
