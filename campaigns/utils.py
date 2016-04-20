@@ -11,18 +11,11 @@ def get_populated_student_specialties(campaign, system_programing_count, compute
     start_position = int(start_position)
     end_position = start_position + int(system_programing_count) + int(computer_networks_count)
 
-    # print(start_position, end_position)
-
-    # for s in student_set:
-    #     print(s.entry_number, s.grades_evaluated)
     requested_students = sorted(
         student_set,
         key = lambda student: student.grades_evaluated,
         reverse = True
     )[start_position-1:end_position-1]
-    # print("+++++++++++++++++++++++++++")
-    # for s in requested_students:
-    #     print(s.entry_number, s.grades_evaluated)
 
     sp_counter = int(system_programing_count)
     cn_counter = int(computer_networks_count)
@@ -39,9 +32,6 @@ def get_populated_student_specialties(campaign, system_programing_count, compute
             cn_counter -= 1
 
         student_counter += 1
-
-    # print("++++++++++++++++++++++++++++")
-    # print(output_set)
 
     return output_set
 
