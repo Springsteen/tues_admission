@@ -5,6 +5,7 @@ from campaigns.models import *
 
 import csv
 
+
 def get_populated_student_specialties(campaign, system_programing_count, computer_networks_count, start_position):
     student_set = campaign.student_set.all()
     output_set = dict()
@@ -13,8 +14,8 @@ def get_populated_student_specialties(campaign, system_programing_count, compute
 
     requested_students = sorted(
         student_set,
-        key = lambda student: student.grades_evaluated,
-        reverse = True
+        key=lambda student: student.grades_evaluated,
+        reverse=True
     )[start_position-1:end_position-1]
 
     sp_counter = int(system_programing_count)
