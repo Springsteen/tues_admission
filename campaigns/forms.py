@@ -2,6 +2,7 @@
 from django import forms
 from campaigns.models import *
 
+
 class CampaignForm(forms.models.ModelForm):
 
     class Meta:
@@ -16,6 +17,7 @@ class CampaignForm(forms.models.ModelForm):
             }),
         }
 
+
 class HallForm(forms.models.ModelForm):
 
     class Meta:
@@ -29,6 +31,7 @@ class HallForm(forms.models.ModelForm):
                 'class': 'form-control',
             }),
         }
+
 
 class StudentForm(forms.models.ModelForm):
 
@@ -89,19 +92,17 @@ class StudentForm(forms.models.ModelForm):
             }),
         }
 
-
     # Student personal data validations
     def clean_egn(self):
         egn = self.cleaned_data['egn']
-        if Student.objects.filter(egn = egn).count() > 0 and not hasattr(self, 'instance'):
+        if Student.objects.filter(egn=egn).count() > 0 and not hasattr(self, 'instance'):
             raise forms.ValidationError(
                 'Вече съществува кандидат с ЕГН: %s' % egn
             )
         return egn
 
-
     # Student choices validations
-    _valid_choices = [ 'СП', 'КМ', '']
+    _valid_choices = ['СП', 'КМ', '']
 
     def clean_first_choice(self):
         first_choice = self.cleaned_data['first_choice'].upper()
@@ -121,10 +122,9 @@ class StudentForm(forms.models.ModelForm):
                 'Невалиден избор на първо желание: %s, моля изберете между КМ и СП или оставете полетата празни' % second_choice
             )
 
-
     # Student grades validations
     def _met_constraints(self, grade):
-        if grade == None or grade < 2 or grade > 6:
+        if grade is None or grade < 2 or grade > 6:
             return False
         return True
 
