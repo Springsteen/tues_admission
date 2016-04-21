@@ -92,6 +92,11 @@ $(document).ready(function (){
     $(document).on('click', '.delete-student', function (e) {
         var answer = confirm('Сигурни ли сте, че искате да изтриете този кандидат?');
         if (!answer) e.preventDefault();
-    })
+    });
+
+    $(document).on('click', '.delete-hall', function (e) {
+        var answer = confirm('Сигурни ли сте, че искате да изтриете тази зала?');
+        if (!answer) e.preventDefault();
+    });
 
 });

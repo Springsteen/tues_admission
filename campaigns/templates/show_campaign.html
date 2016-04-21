@@ -58,7 +58,7 @@
                     <td><center>
                         <form method="POST" action="/campaigns/{{campaign.id}}/halls/{{h.id}}/delete">
                             {% csrf_token %}
-                            <button type="submit">Изтрий</button>
+                            <button type="submit" class="delete-hall">Изтрий</button>
                         </form>
                     </center></td>
                 </tr>
