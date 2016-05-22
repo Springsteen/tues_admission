@@ -21,7 +21,6 @@ INSTALLED_APPS = (
 
     'django_extensions',
     'south',
-    'social.apps.django_app.default',
 
     'campaigns',
 )
@@ -84,7 +83,6 @@ STATIC_ROOT = os.path.join(os.path.dirname(__file__), '..', 'static')
 STATIC_URL = '/static/'
 
 AUTHENTICATION_BACKENDS = (
-    'social.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -96,8 +94,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
    'django.core.context_processors.static',
    'django.core.context_processors.tz',
    'django.contrib.messages.context_processors.messages',
-   'social.apps.django_app.context_processors.backends',
-   'social.apps.django_app.context_processors.login_redirect',
 )
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '890110708365-boaltcp16pb7b2ungo38jaoqmk4ilrrq.apps.googleusercontent.com'
@@ -110,15 +106,3 @@ SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'http://tues-admission-752.appspot.com/campaign
 
 # SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_EMAILS = whitelist
 
-SOCIAL_AUTH_PIPELINE = (
-    'social.pipeline.social_auth.social_details',
-    'social.pipeline.social_auth.social_uid',
-    'social.pipeline.social_auth.auth_allowed',
-    'social.pipeline.social_auth.social_user',
-    'social.pipeline.user.get_username',
-    'social.pipeline.social_auth.associate_by_email',
-    'social.pipeline.user.create_user',
-    'social.pipeline.social_auth.associate_user',
-    'social.pipeline.social_auth.load_extra_data',
-    'social.pipeline.user.user_details'
-)

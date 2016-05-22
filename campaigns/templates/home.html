@@ -18,14 +18,6 @@
                 <input type="submit" value="Вход" class="btn btn-primary" id="id_login_submit_button"/>
             </form>
 
-            <form id="google-login" method="get" action="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}" role="form">
-                <button
-                    type="submit"
-                    class="btn"
-                >
-                    Влез с Google
-                </button>
-            </form>
         </div>
     {% endif %}
 {% endblock %}
