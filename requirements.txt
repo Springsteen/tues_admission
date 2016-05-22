@@ -4,7 +4,7 @@ argparse==1.2.1
 django-extensions==1.4.9
 graphviz==0.4.2
 pydot==1.0.2
-pygraphviz==1.2
+pygraphviz==1.1
 pyparsing==1.5.7
 reportlab==3.1.8
 six==1.8.0
